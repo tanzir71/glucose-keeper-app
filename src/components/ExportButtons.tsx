@@ -1,20 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { FileText, FileSpreadsheet } from 'lucide-react';
-import { GlucoseReading } from '@/types/glucose';
+import { GlucoseReading, GlucoseUnit } from '@/types/glucose';
 import { exportToCSV, exportToPDF } from '@/lib/export';
 import { toast } from 'sonner';
 
 interface ExportButtonsProps {
   readings: GlucoseReading[];
+  unit: GlucoseUnit;
 }
 
-export const ExportButtons = ({ readings }: ExportButtonsProps) => {
+export const ExportButtons = ({ readings, unit }: ExportButtonsProps) => {
   const handleExportPDF = () => {
     if (readings.length === 0) {
       toast.error('No readings to export');
       return;
     }
-    exportToPDF(readings);
+    exportToPDF(readings, unit);
     toast.success('PDF exported successfully');
   };
 
@@ -23,7 +24,7 @@ export const ExportButtons = ({ readings }: ExportButtonsProps) => {
       toast.error('No readings to export');
       return;
     }
-    exportToCSV(readings);
+    exportToCSV(readings, unit);
     toast.success('CSV exported successfully');
   };
 

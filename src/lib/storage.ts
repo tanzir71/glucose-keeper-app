@@ -1,6 +1,7 @@
-import { GlucoseReading } from '@/types/glucose';
+import { GlucoseReading, GlucoseUnit } from '@/types/glucose';
 
 const STORAGE_KEY = 'glucose_readings';
+const UNIT_KEY = 'glucose_unit';
 
 export const saveReadings = (readings: GlucoseReading[]): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(readings));
@@ -23,4 +24,13 @@ export const deleteReading = (id: string): GlucoseReading[] => {
   const newReadings = readings.filter(r => r.id !== id);
   saveReadings(newReadings);
   return newReadings;
+};
+
+export const saveUnit = (unit: GlucoseUnit): void => {
+  localStorage.setItem(UNIT_KEY, unit);
+};
+
+export const loadUnit = (): GlucoseUnit => {
+  const unit = localStorage.getItem(UNIT_KEY);
+  return (unit as GlucoseUnit) || 'mmol/L';
 };
