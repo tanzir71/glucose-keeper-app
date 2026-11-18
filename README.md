@@ -1,73 +1,47 @@
-# Welcome to your Lovable project
+# Glucose Keeper
 
-## Project info
+A small, single-page blood glucose log that runs entirely in the browser. Add readings, see them on a chart with a daily summary, and export them as CSV or PDF. Data stays in the browser's `localStorage`; there is no backend or account.
 
-**URL**: https://lovable.dev/projects/23bf407a-558c-4a18-b6c0-014b9d652b87
+## Features
 
-## How can I edit this code?
+- Add a reading with value, time and an optional note for the selected date
+- Switch between mmol/L and mg/dL; values are stored in mg/dL and converted for display
+- Readings classified as low (below 70 mg/dL), normal or high (above 180 mg/dL) with colour coding
+- Date selector, readings list with delete, stats card and trend chart (Recharts)
+- Export to CSV or PDF (jsPDF with jspdf-autotable)
 
-There are several ways of editing your application.
+This is a personal tracking aid, not medical advice or a medical device. The low/high thresholds are fixed in code and are not configurable.
 
-**Use Lovable**
+## Tech stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/23bf407a-558c-4a18-b6c0-014b9d652b87) and start prompting.
+Vite, React 18, TypeScript, Tailwind CSS, shadcn/ui (Radix), Recharts, jsPDF, date-fns. Originally scaffolded with Lovable.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting started
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Prerequisites: Node.js and npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open the local URL printed by Vite.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build |
+| `npm run build:dev` | Build in development mode |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Serve the production build locally |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project structure
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/23bf407a-558c-4a18-b6c0-014b9d652b87) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```
+src/pages/        Index and NotFound pages
+src/components/   form, chart, list, stats, unit switcher, date selector, export buttons (+ ui/)
+src/lib/          localStorage persistence and CSV/PDF export
+src/types/        reading types, unit conversion, glucose level thresholds
+```
