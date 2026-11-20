@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Overline } from "@/components/keeper/Controls";
-import { TabScreen } from "@/components/keeper/Layout";
+import { TabScreen, WhyThis } from "@/components/keeper/Layout";
 import { Quilt } from "@/components/keeper/Visuals";
 import { TimelineItem } from "@/components/keeper/TimelineItem";
 import { BandDot } from "@/components/keeper/RangeBar";
@@ -109,6 +109,7 @@ export default function Week() {
               {t.week.notNow}
             </Button>
           </div>
+          <WhyThis reason={invitation.reason} className="mt-3" />
         </section>
       )}
 

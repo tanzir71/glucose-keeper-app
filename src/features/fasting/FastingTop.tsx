@@ -6,6 +6,7 @@ import { Chip } from "@/components/keeper/Chip";
 import { Overline } from "@/components/keeper/Controls";
 import { Ring } from "@/components/keeper/Visuals";
 import { DateAvatar } from "@/features/today/TodayTop";
+import { WhyThis } from "@/components/keeper/Layout";
 import { addFastDrink, addFastFeeling, endFast, startFast } from "@/lib/fastingStore";
 import { canStart, eatingWindow, fastProgress, nextFastStart, offerNextStep, weightSoftening } from "@/lib/rules/fasting";
 import { useStopRules } from "./useStopRules";
@@ -50,6 +51,7 @@ export function StepUpCard({ settings, sessions, readings, logs, weights, now }:
   return (
     <section className="rounded-card bg-primary-soft p-4">
       <p className="t-body-strong">{t.fasting.stepUp(offer.hours)}</p>
+      <WhyThis reason={offer.reason} className="mt-2" />
       <div className="mt-3 flex gap-2">
         <Button size="sm" onClick={() => canStart(offer.next, settings.fasting).ok && record({ track: offer.next, windowStart: undefined })}>
           {t.fasting.tryIt}

@@ -60,18 +60,18 @@ export function shouldInvite(input: InviteInput): Invitation | null {
     const slot = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
     const slotsWord = slot ? t.slotsPlural[slot] : "meals";
     const pattern = t.invitation.t1(heavy.length, big, slotsWord);
-    return { trigger: "T1", pattern, body, reason: pattern };
+    return { trigger: "T1", pattern, body, reason: t.invitation.reasonT1(heavy.length) };
   }
 
   // T3: ≥ 2 glucose Learn cards opened in 14 days.
   const opened = new Set(
     (settings.learnOpens ?? []).filter((o) => GLUCOSE_LEARN_CARDS.includes(o.cardId) && within(o.at, now, 14)).map((o) => o.cardId),
   );
-  if (opened.size >= 2) return { trigger: "T3", pattern: t.invitation.t3, body, reason: t.invitation.t3 };
+  if (opened.size >= 2) return { trigger: "T3", pattern: t.invitation.t3, body, reason: t.invitation.reasonT3(opened.size) };
 
   // T2: ≥ 7 distinct local days with a log in 14 days.
   const days = new Set(logs.filter((l) => within(l.at, now, 14)).map((l) => localDay(l.at)));
-  if (days.size >= 7) return { trigger: "T2", pattern: t.invitation.t2, body, reason: t.invitation.t2 };
+  if (days.size >= 7) return { trigger: "T2", pattern: t.invitation.t2, body, reason: t.invitation.reasonT2(days.size) };
 
   return null;
 }

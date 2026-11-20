@@ -44,6 +44,11 @@ describe("shouldInvite triggers", () => {
     expect(r?.pattern).toBe("You felt sleepy after 3 big lunches.");
   });
 
+  it("every trigger carries a human-readable reason with counts", () => {
+    expect(shouldInvite(input(sleepyLunches(3, 2)))?.reason).toBe("3 sleepy or heavy check-ins in the last two weeks");
+    expect(shouldInvite(input({ logs: oneLogPerDay(8) }))?.reason).toBe("8 days with something logged in the last two weeks");
+  });
+
   it("T1: 'big' only when at least 2 of those meals were big", () => {
     expect(shouldInvite(input(sleepyLunches(3, 1)))?.pattern).toBe("You felt sleepy after 3 lunches.");
   });

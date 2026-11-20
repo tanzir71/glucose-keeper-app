@@ -9,6 +9,7 @@ import {
   SKIPPED_MEALS_PER_WEEK,
   breaksFast,
 } from "@/lib/clinical/thresholds";
+import { t } from "@/copy/en";
 import type { FastSession, FastTrack, FeelingData, GlucoseReading, LogEntry, Rhythm, Settings, WeightEntry } from "@/types/domain";
 import { DEFAULT_RHYTHM, addMinutes, atTime, formatHM, isWithin, localDay, minutesBetween, parseHM } from "./time";
 
@@ -178,7 +179,7 @@ export interface StepUpInput {
   softening: boolean;
 }
 
-export function offerNextStep({ now, fasting, sessions, readings, logs, softening }: StepUpInput): { next: FastTrack; hours: number } | null {
+export function offerNextStep({ now, fasting, sessions, readings, logs, softening }: StepUpInput): { next: FastTrack; hours: number; reason: string } | null {
   const track = fasting.track;
   if (!track || !["overnight-12", "window-13", "window-14"].includes(track)) return null;
   if (fasting.excluded) return null;
@@ -202,5 +203,9 @@ export function offerNextStep({ now, fasting, sessions, readings, logs, softenin
   );
   if (lowUnwell) return null;
   if (!canStart(next, fasting).ok) return null;
-  return { next, hours: TRACK_HOURS[next as keyof typeof TRACK_HOURS] };
+  return {
+    next,
+    hours: TRACK_HOURS[next as keyof typeof TRACK_HOURS],
+    reason: t.fasting.stepUpReason(completedDays.size, t.fasting.trackNames[track]),
+  };
 }

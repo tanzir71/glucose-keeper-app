@@ -163,7 +163,11 @@ describe("offerNextStep (05 §4.4)", () => {
   });
 
   it("offers 13 h after 5 easy days on 12 h", () => {
-    expect(offerNextStep(base())).toEqual({ next: "window-13", hours: 13 });
+    expect(offerNextStep(base())).toEqual({
+      next: "window-13",
+      hours: 13,
+      reason: "5 of the last 7 days on the 12 h track ended as planned, with no shaky moments or lows",
+    });
   });
 
   it("needs 5 of the last 7 days", () => {

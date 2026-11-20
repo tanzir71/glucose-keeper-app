@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Overline } from "@/components/keeper/Controls";
 import { DateAvatar } from "@/features/today/TodayTop";
+import { WhyThis } from "@/components/keeper/Layout";
 import { startFast } from "@/lib/fastingStore";
 import { CITIES, DEFAULT_RAMADAN, PRE_RAMADAN_WEEKS, ramadanPhase, type RamadanPhase } from "@/lib/ramadan";
 import { canStart } from "@/lib/rules/fasting";
@@ -207,15 +208,22 @@ export function RamadanTop({
               ))}
             </div>
           </div>
-          {now >= iftarPlus60 && settings.tinyHabits && settings.habitsEnabled.includes("stroll") && (
-            <Link
-              to="/habit/stroll?min=10&place=home"
-              className="t-body-strong flex min-h-11 items-center gap-2 rounded-card bg-move-soft p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
+        </>
+      )}
+
+      {settings.tinyHabits && settings.habitsEnabled.includes("stroll") && (
+        <div className="rounded-card bg-move-soft p-4">
+          {now >= iftarPlus60 ? (
+            <Link to="/habit/stroll?min=10&place=home" className="t-body-strong flex min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <Leaf aria-hidden className="h-4 w-4" /> {t.ramadan.postIftar}
             </Link>
+          ) : (
+            <p className="t-body-strong flex items-center gap-2">
+              <Leaf aria-hidden className="h-4 w-4" /> {t.ramadan.postIftarSaved(fmtTime(iftarPlus60))}
+            </p>
           )}
-        </>
+          <WhyThis reason={t.ramadan.postIftarReason} className="mt-2" />
+        </div>
       )}
     </header>
   );

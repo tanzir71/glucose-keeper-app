@@ -384,6 +384,9 @@ export const en = {
     t1: (n: number, big: boolean, slots: string) => `You felt sleepy after ${n} ${big ? "big " : ""}${slots}.`,
     t2: "You've noticed your days for a whole week.",
     t3: "You've been reading about glucose.",
+    reasonT1: (n: number) => `${n} sleepy or heavy check-ins in the last two weeks`,
+    reasonT2: (days: number) => `${days} days with something logged in the last two weeks`,
+    reasonT3: (n: number) => `${n} glucose Learn cards opened in the last two weeks`,
   },
 
   // ---------- Glucose ladder ----------
@@ -747,6 +750,8 @@ export const en = {
     stopRulesLink: "Break your fast if…",
     // Step-up (05 §4.4)
     stepUp: (h: number) => `Ready to try ${h} hours? Only if it felt easy.`,
+    stepUpReason: (days: number, track: string) =>
+      `${days} of the last 7 days on the ${track} track ended as planned, with no shaky moments or lows`,
     tryIt: "Try it",
     softening: "Your care team can help you find a pace that suits you.",
     // Stop sheet (05 §4.5–4.6) [CLINICAL-REVIEW]
@@ -799,6 +804,8 @@ export const en = {
     water: "Water between iftar & suhoor",
     waterGlass: (i: number, filled: boolean) => `Glass ${i}${filled ? ", had" : ""}`,
     postIftar: "After iftar: a gentle 10-minute stroll",
+    postIftarSaved: (time: string) => `After iftar: a gentle 10-minute stroll — saved for ${time}`,
+    postIftarReason: "tiny habits wait until an hour after iftar, so the fast and the meal come first",
     // [CLINICAL-REVIEW]
     highRisk: "Insulin or sulfonylureas can cause lows while fasting. Please speak with your care team before you fast — and check if you feel off.",
     planCard: "Plan with your care team 6–8 weeks before",
