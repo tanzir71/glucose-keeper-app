@@ -839,6 +839,20 @@ export const en = {
     save: "Save",
   },
 
+  // ---------- Install (PWA) ----------
+  install: {
+    title: "Keep Keeper on your home screen",
+    body: "It opens like an app, works offline, and the icon just says “Keeper”.",
+    add: "Add to home screen",
+    later: "Not now",
+    iosTitle: "Add Keeper to your home screen",
+    iosSteps: ["Tap the Share button in Safari", "Choose “Add to Home Screen”", "Tap Add — the icon just says “Keeper”"],
+    iosNote: "On iPhone, the home-screen Keeper keeps its own diary, so it's best to add it before you log much.",
+    menuSteps: ["Open your browser menu (⋮)", "Choose “Install app” or “Add to Home screen”"],
+    added: "Keeper is on your home screen.",
+    share: "Share",
+  },
+
   // ---------- Landing page (Figma 23:3) ----------
   landing: {
     nav: { how: "How it works", features: "Features", fasting: "Fasting", safety: "Safety", faq: "FAQ", open: "Open Keeper", menu: "Sections", home: "Keeper home", footer: "Footer", skip: "Skip to content" },

@@ -22,6 +22,7 @@ import { t } from "@/copy/en";
 import type { LogKind, Settings } from "@/types/domain";
 import { Timeline, patchesFor } from "./Timeline";
 import { TodayTop } from "./TodayTop";
+import { InstallCard } from "./InstallCard";
 
 // Fasting and Ramadan variants (and adhan) load only when Fasting mode is on.
 const FastingTop = lazy(() => import("@/features/fasting/FastingTop").then((m) => ({ default: m.FastingTop })));
@@ -107,6 +108,10 @@ export default function Today() {
           </div>
         )}
       </Suspense>
+
+      <div className="mt-4 empty:hidden">
+        <InstallCard settings={settings} now={now} />
+      </div>
 
       <section className="mt-6" aria-labelledby="add-to-today">
         <Overline as="h2">

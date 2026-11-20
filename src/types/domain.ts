@@ -181,4 +181,6 @@ export interface Settings {
   checkinDismissed?: string[];
   /** Daily reminder time for the optional .ics calendar nudge. */
   reminderTime?: string;
+  /** "Not now" on the install card hides it for a while. */
+  installPrompt?: { snoozedUntil?: string };
 }
