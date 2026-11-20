@@ -44,24 +44,27 @@ export function invitationEligible(input: InviteInput): boolean {
   return true;
 }
 
+/** T1's pattern: ≥ 3 sleepy or heavy check-ins in 14 days, with the most frequent slot. */
+export function sleepyPattern(now: Date, logs: LogEntry[], checkins: CheckIn[]): { n: number; big: boolean; slots: string } | null {
+  const meals = new Map(logs.filter((l) => l.data.kind === "meal").map((l) => [l.id, l as LogEntry<MealData>]));
+  const heavy = checkins.filter((c) => within(c.at, now, 14) && (c.energy === "sleepy" || c.tags.includes("heavy")));
+  if (heavy.length < 3) return null;
+  const theirMeals = heavy.map((c) => meals.get(c.mealId)).filter((m): m is LogEntry<MealData> => !!m);
+  const big = theirMeals.filter((m) => m.data.size === "big").length >= 2;
+  const counts = new Map<MealSlot, number>();
+  for (const m of theirMeals) if (m.data.slot) counts.set(m.data.slot, (counts.get(m.data.slot) ?? 0) + 1);
+  const slot = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  return { n: heavy.length, big, slots: slot ? t.slotsPlural[slot] : "meals" };
+}
+
 export function shouldInvite(input: InviteInput): Invitation | null {
   if (!invitationEligible(input)) return null;
   const { now, logs, checkins, settings } = input;
   const body = t.week.invitationBody;
 
   // T1: ≥ 3 check-ins in 14 days that felt sleepy or heavy.
-  const meals = new Map(logs.filter((l) => l.data.kind === "meal").map((l) => [l.id, l as LogEntry<MealData>]));
-  const heavy = checkins.filter((c) => within(c.at, now, 14) && (c.energy === "sleepy" || c.tags.includes("heavy")));
-  if (heavy.length >= 3) {
-    const theirMeals = heavy.map((c) => meals.get(c.mealId)).filter((m): m is LogEntry<MealData> => !!m);
-    const big = theirMeals.filter((m) => m.data.size === "big").length >= 2;
-    const counts = new Map<MealSlot, number>();
-    for (const m of theirMeals) if (m.data.slot) counts.set(m.data.slot, (counts.get(m.data.slot) ?? 0) + 1);
-    const slot = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
-    const slotsWord = slot ? t.slotsPlural[slot] : "meals";
-    const pattern = t.invitation.t1(heavy.length, big, slotsWord);
-    return { trigger: "T1", pattern, body, reason: t.invitation.reasonT1(heavy.length) };
-  }
+  const p = sleepyPattern(now, logs, checkins);
+  if (p) return { trigger: "T1", pattern: t.invitation.t1(p.n, p.big, p.slots), body, reason: t.invitation.reasonT1(p.n) };
 
   // T3: ≥ 2 glucose Learn cards opened in 14 days.
   const opened = new Set(

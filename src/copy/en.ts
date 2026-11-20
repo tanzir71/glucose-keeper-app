@@ -165,6 +165,9 @@ export const en = {
     envelopesOpen: "See envelopes",
     avatarLabel: "You",
     habitLeaf: "Tiny habit",
+    fastingOfferTitle: "Fasting days?",
+    fastingOfferBody: "Keeper has a gentle Fasting mode, with a Ramadan preset — always behind a safety check.",
+    fastingOfferLook: "Have a look",
     checkGlucose: "Check your glucose",
     checkGlucoseBody: "Sealed until you choose to open it.",
   },
@@ -256,6 +259,7 @@ export const en = {
     patternTitle: "A pattern you might be curious about",
     pattern: (n: number, big: boolean, slots: string) =>
       `You've felt sleepy after ${n} ${big ? "big " : ""}${slots} this week. Keeper will show you this gently in your week.`,
+    patternPlain: (n: number, big: boolean, slots: string) => `You've felt sleepy after ${n} ${big ? "big " : ""}${slots} lately.`,
     later: "Ask me later",
     glucoseHint: "Curious how it landed? You can check your glucose any time.",
     glucoseHintCta: "Check now",
@@ -364,6 +368,11 @@ export const en = {
     seeNumbers: "See all numbers",
     insightCaption: (a: number, b: number, what: string) => `${a} of ${b} ${what} · only your own logs`,
     weight: "Weekly weight",
+    feedbackTitle: "How is Keeper for you?",
+    feedbackBody: "A quick check every few weeks. Your answer stays on this phone.",
+    feedbackThanks: "Thank you. That stays on this phone.",
+    feedbackNote: "Tell us more by email",
+    feedbackSubject: "Keeper feedback",
   },
 
   insights: {

@@ -8,7 +8,8 @@ import { FaceGroup } from "@/components/keeper/FaceOption";
 import { Overline } from "@/components/keeper/Controls";
 import { CloseHeader, FlowScreen } from "@/components/keeper/Layout";
 import { db } from "@/lib/db";
-import { addCheckIn } from "@/lib/data";
+import { addCheckIn, useActiveFast, useNow, useRecent } from "@/lib/data";
+import { invitationEligible, sleepyPattern } from "@/lib/rules/invitation";
 import { reachLadderStep, updateSettings, useSettings } from "@/lib/settings";
 import { minutesBetween } from "@/lib/rules/time";
 import { fmtDuration } from "@/lib/format";
@@ -24,13 +25,9 @@ export default function CheckIn() {
   const navigate = useNavigate();
   const settings = useSettings();
   const meal = useLiveQuery(() => (mealId ? db.logs.get(mealId) : undefined), [mealId]) as LogEntry<MealData> | undefined;
-  const pattern = useLiveQuery(async () => {
-    const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
-    const recent = await db.checkins.where("at").aboveOrEqual(weekAgo).toArray();
-    const heavy = recent.filter((c) => c.energy === "sleepy" || c.tags.includes("heavy"));
-    const meals = await db.logs.bulkGet(heavy.map((c) => c.mealId));
-    return { count: heavy.length, big: meals.filter((m) => m?.data.kind === "meal" && m.data.size === "big").length };
-  }, []);
+  const now = useNow();
+  const recent = useRecent(14, now);
+  const activeFast = useActiveFast();
   const [energy, setEnergy] = useState<Energy>();
   const [tags, setTags] = useState<string[]>([]);
 
@@ -48,11 +45,13 @@ export default function CheckIn() {
       return rest.includes(x) ? rest.filter((y) => y !== x) : [...rest, x];
     });
 
-  // The pattern card shows when this check-in makes three sleepy or heavy ones this week.
+  // The pattern card shows only when the invitation engine sees a pattern (04 §2, T1),
+  // counting the answer she's giving right now.
   const thisCounts = energy === "sleepy" || tags.includes("heavy");
-  const n = (pattern?.count ?? 0) + (thisCounts ? 1 : 0);
-  const big = (pattern?.big ?? 0) + (thisCounts && meal.data.size === "big" ? 1 : 0) >= 2;
-  const showPattern = thisCounts && n >= 3;
+  const pending = thisCounts && energy ? [{ id: "pending", mealId: meal.id, at: now.toISOString(), energy, tags }] : [];
+  const pattern = thisCounts && recent ? sleepyPattern(now, recent.logs, [...recent.checkins.filter((c) => c.mealId !== meal.id), ...pending]) : null;
+  const invites =
+    !!recent && invitationEligible({ now, settings, logs: recent.logs, checkins: recent.checkins, activeFast: !!activeFast });
 
   const save = async () => {
     if (!energy) return;
@@ -103,13 +102,15 @@ export default function CheckIn() {
         ))}
       </div>
 
-      {showPattern && (
+      {pattern && (
         <section className="mt-6 rounded-card bg-feeling-soft p-4" aria-live="polite">
           <p className="t-label flex items-center gap-1.5">
             <Sparkles aria-hidden className="h-4 w-4" />
             {t.checkin.patternTitle}
           </p>
-          <p className="t-body mt-2">{t.checkin.pattern(n, big, t.slotsPlural[slot])}</p>
+          <p className="t-body mt-2">
+            {invites ? t.checkin.pattern(pattern.n, pattern.big, pattern.slots) : t.checkin.patternPlain(pattern.n, pattern.big, pattern.slots)}
+          </p>
         </section>
       )}
 

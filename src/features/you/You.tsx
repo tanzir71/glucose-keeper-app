@@ -152,6 +152,14 @@ export default function You() {
       </section>
 
       <section className="mt-4 rounded-card bg-card p-4">
+        <h2 className="t-body-strong">{t.you.feedback}</h2>
+        <p className="t-caption mt-1 text-muted-foreground">{t.you.feedbackBody}</p>
+        <a href={`mailto:?subject=${encodeURIComponent(t.week.feedbackSubject)}`} className="t-label mt-2 inline-flex min-h-11 items-center gap-1.5 text-primary">
+          <Mail aria-hidden className="h-4 w-4" /> {t.week.feedbackNote}
+        </a>
+      </section>
+
+      <section className="mt-4 rounded-card bg-card p-4">
         <h2 className="t-body-strong flex items-center gap-2">
           <ShieldCheck aria-hidden className="h-4 w-4" /> {t.you.sections.about}
         </h2>

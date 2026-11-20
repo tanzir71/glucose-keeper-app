@@ -183,4 +183,10 @@ export interface Settings {
   reminderTime?: string;
   /** "Not now" on the install card hides it for a while. */
   installPrompt?: { snoozedUntil?: string };
+  /** A3 "Ramadan & fasting days": the Fasting mode offer on Today has been seen. */
+  fastingOfferSeen?: boolean;
+  /** When onboarding finished, for the 4-weekly "How is Keeper for you?" check-in. */
+  firstUsedAt?: string;
+  /** Local-only answers to "How is Keeper for you?" (06 §5 Q8). Never sent anywhere. */
+  feedback?: { lastAt?: string; answers?: { at: string; mood: "low" | "okay" | "good" }[] };
 }

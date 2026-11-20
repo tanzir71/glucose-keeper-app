@@ -16,7 +16,8 @@ import { inEatingWindow } from "@/lib/rules/fasting";
 import { pickNudge } from "@/lib/rules/smart-timing";
 import { localDay, minutesBetween } from "@/lib/rules/time";
 import { fmtTime } from "@/lib/format";
-import { showsGlucose, useSettings } from "@/lib/settings";
+import { showsGlucose, updateSettings, useSettings } from "@/lib/settings";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { t } from "@/copy/en";
 import type { LogKind, Settings } from "@/types/domain";
@@ -113,6 +114,29 @@ export default function Today() {
       <div className="mt-4 empty:hidden">
         <InstallCard settings={settings} now={now} />
       </div>
+
+      {settings.rhythm?.fastingDays && !track && !settings.fastingOfferSeen && (
+        <section className="mt-4 rounded-card bg-sleep-soft p-4" aria-labelledby="fasting-offer">
+          <h2 id="fasting-offer" className="t-body-strong">
+            {t.today.fastingOfferTitle}
+          </h2>
+          <p className="t-body mt-1">{t.today.fastingOfferBody}</p>
+          <div className="mt-3 flex gap-2">
+            <Button
+              size="sm"
+              onClick={async () => {
+                await updateSettings({ fastingOfferSeen: true });
+                navigate("/you/fasting");
+              }}
+            >
+              {t.today.fastingOfferLook}
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => updateSettings({ fastingOfferSeen: true })}>
+              {t.common.notNow}
+            </Button>
+          </div>
+        </section>
+      )}
 
       <section className="mt-6" aria-labelledby="add-to-today">
         <Overline as="h2">

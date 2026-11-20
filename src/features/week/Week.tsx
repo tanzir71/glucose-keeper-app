@@ -17,6 +17,7 @@ import { fmtDayRange, fmtDayTime, weekdayInitial } from "@/lib/format";
 import { showsGlucose, updateSettings, useSettings } from "@/lib/settings";
 import { patchesFor } from "@/features/today/logView";
 import { WeightCard } from "@/features/fasting/WeightCard";
+import { FeedbackCard } from "./FeedbackCard";
 import { t } from "@/copy/en";
 
 /** D1 Week (Figma 16:387). */
@@ -112,6 +113,10 @@ export default function Week() {
           <WhyThis reason={invitation.reason} className="mt-3" />
         </section>
       )}
+
+      <div className="mt-3 empty:hidden">
+        <FeedbackCard settings={settings} now={now} />
+      </div>
 
       {settings.weightTracking && !settings.fasting.excluded && (
         <div className="mt-3">

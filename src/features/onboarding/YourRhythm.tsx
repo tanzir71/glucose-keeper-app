@@ -42,7 +42,7 @@ export default function YourRhythm() {
   const finish = async (save: boolean) => {
     const r = rhythm ?? {};
     // Skipping keeps anything already entered; an untouched form leaves rhythm undefined.
-    await updateSettings({ onboarded: true, ...(save || !rhythmIsEmpty(r) ? { rhythm: rhythmIsEmpty(r) ? undefined : r } : {}) });
+    await updateSettings({ onboarded: true, firstUsedAt: settings?.firstUsedAt ?? new Date().toISOString(), ...(save || !rhythmIsEmpty(r) ? { rhythm: rhythmIsEmpty(r) ? undefined : r } : {}) });
     try {
       sessionStorage.removeItem(DRAFT_KEY);
     } catch {
