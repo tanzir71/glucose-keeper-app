@@ -60,8 +60,8 @@ src/landing/                 the marketing landing page
 docs/keeper-v2/              the handoff spec, OCR spike notes, M6 checklist, clinical review list
 ```
 
-## Deploying
-Pushing to `main` runs `.github/workflows/deploy.yml`, which lints, tests, builds and publishes `dist/` to GitHub Pages. In the repo's Settings → Pages, set **Source = GitHub Actions**.
+## Building
+`npm run build` writes the landing page and the app to `dist/` (base path `/glucose-keeper-app/`). There's no CI: run `npm run lint`, `npm test -- --run` and `npm run build` before pushing.
 
 ## Upgrading from v1
 On first open, v1 readings in `localStorage` are copied into IndexedDB, and the Numbers view is switched on so the old history stays visible. The v1 keys are kept until v2.1.

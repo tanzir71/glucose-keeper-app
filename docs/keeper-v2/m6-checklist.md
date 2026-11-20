@@ -16,4 +16,3 @@
 - [ ] Lighthouse on a mid-range phone profile: PWA installable, Performance ≥ 90, LCP < 2.5 s.
 - [ ] M3.0: OCR accuracy on ≥ 20 real meter photos (see [`ocr-spike.md`](ocr-spike.md)).
 - [ ] Clinician sign-off on the checklist above.
-- [ ] Repo Settings → Pages → **Source = GitHub Actions**, then merge to `main` to deploy.
