@@ -2,103 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Keeper design tokens. Source: docs/keeper-v2/02-design-system.md (Figma "Keeper Color").
+   Warm paper, soft ink, no alarms. No red anywhere: --destructive maps to the plum safety colour. */
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 215 25% 27%;
+    /* shadcn semantic tokens */
+    --background: 37 42% 94%; /* #F6F1E9 oat paper */
+    --foreground: 251 12% 18%; /* #2A2833 soft ink */
+    --card: 38 100% 98%; /* #FFFCF7 surface */
+    --card-foreground: 251 12% 18%;
+    --popover: 38 100% 98%;
+    --popover-foreground: 251 12% 18%;
+    --primary: 138 22% 37%; /* #4A7356 moss */
+    --primary-foreground: 38 100% 98%;
+    --secondary: 125 21% 89%; /* = primary-soft */
+    --secondary-foreground: 138 24% 34%;
+    --muted: 38 37% 90%; /* #EFE8DC surface-sunken */
+    --muted-foreground: 262 6% 39%; /* #625E69 (darkened for AA) */
+    --accent: 125 21% 89%;
+    --accent-foreground: 138 24% 34%;
+    --destructive: 260 32% 27%; /* = safety plum, NOT red */
+    --destructive-foreground: 38 100% 98%;
+    --border: 36 32% 85%; /* #E4DACB */
+    --input: 36 32% 85%;
+    --ring: 138 22% 37%;
+    --radius: 1.25rem; /* 20px */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    /* Keeper tokens */
+    --primary-soft: 125 21% 89%; /* #DDE9DE */
+    --primary-strong: 138 24% 34%; /* #416A4D: text/icons on soft fills */
+    --meal: 21 71% 70%;
+    --meal-soft: 24 83% 91%; /* #E9A27C / #FBE3D3 */
+    --sleep: 253 51% 71%;
+    --sleep-soft: 256 66% 94%; /* #9F8FDB / #ECE7FA */
+    --feeling: 43 74% 57%;
+    --feeling-soft: 45 85% 90%; /* #E2B53F / #FBF0CF */
+    --move: 147 23% 54%;
+    --move-soft: 130 27% 91%; /* #6FA487 / #E3EFE5 */
+    --water: 196 43% 61%;
+    --water-soft: 194 51% 92%; /* #6FAFC6 / #E0F0F5 */
+    --range-below: 252 49% 79%; /* #B9AEE3 lavender */
+    --range-in: 134 24% 69%; /* #9CC2A5 sage */
+    --range-above: 23 78% 73%; /* #F0AE86 apricot */
+    --safety: 260 32% 27%; /* #3E2F5B plum */
+    --safety-foreground: 38 100% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
-
-    --primary: 211 100% 43%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 142 71% 45%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 211 100% 43%;
-
-    --radius: 0.75rem;
-
-    --success: 142 71% 45%;
-    --warning: 38 92% 50%;
-    --info: 199 89% 48%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(211 100% 43%) 0%, hsl(199 89% 48%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 71% 35%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 100%);
-
-    --shadow-sm: 0 2px 8px hsla(211 100% 43% / 0.1);
-    --shadow-md: 0 4px 16px hsla(211 100% 43% / 0.15);
-    --shadow-lg: 0 8px 24px hsla(211 100% 43% / 0.2);
-
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-soft: 0 8px 24px hsl(251 12% 18% / 0.07);
+    --shadow-lift: 0 2px 6px hsl(251 12% 18% / 0.1);
   }
 
-  .dark {
-    --background: 215 28% 17%;
-    --foreground: 210 40% 98%;
-
-    --card: 215 28% 20%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 215 28% 20%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 211 100% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 142 71% 45%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 215 28% 25%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 215 28% 25%;
-    --input: 215 28% 25%;
-    --ring: 211 100% 50%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  html {
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground antialiased;
   }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  /* Visible focus ring everywhere (keyboard users). */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
   }
 
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  /* Reduced motion: no transitions. Animations are handled per component (sheets fade instead
+     of sliding via motion-reduce: variants; the ring doesn't animate). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Type scale: matches the Figma text styles Keeper/*. Sizes in rem so text zoom scales them. */
+@layer components {
+  .t-display {
+    @apply font-serif font-semibold;
+    font-size: 2.25rem;
+    line-height: 2.625rem;
+    letter-spacing: -1px;
+  }
+  .t-title {
+    @apply font-serif font-semibold;
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+    letter-spacing: -0.5px;
+  }
+  .t-heading {
+    @apply font-serif font-semibold;
+    font-size: 1.3125rem;
+    line-height: 1.6875rem;
+    letter-spacing: -0.2px;
+  }
+  .t-quote {
+    @apply font-serif italic;
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.875rem;
+  }
+  .t-number {
+    @apply font-serif;
+    font-weight: 400;
+    font-size: 3.5rem;
+    line-height: 3.75rem;
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .t-body-l {
+    font-size: 1.0625rem;
+    line-height: 1.5625rem;
+    font-weight: 400;
+  }
+  .t-body {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+  }
+  .t-body-strong {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: 600;
+  }
+  .t-label {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+  }
+  .t-caption {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+  }
+  .t-overline {
+    font-size: 0.6875rem;
+    line-height: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  /* Screen padding: 24px sides, status-bar-safe top. */
+  .screen {
+    @apply mx-auto w-full max-w-app px-6;
+    padding-top: max(env(safe-area-inset-top), 1.25rem);
+  }
+
+  /* Meter photos are only ever rendered through a blur until the envelope is opened. */
+  .sealed-blur {
+    filter: blur(24px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .masked-input {
+    -webkit-text-security: disc;
   }
 }

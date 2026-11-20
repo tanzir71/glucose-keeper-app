@@ -1,8 +1,8 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
-  darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: ["./index.html", "./app/index.html", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -47,44 +47,49 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
-        info: "hsl(var(--info))",
+        "primary-soft": "hsl(var(--primary-soft))",
+        "primary-strong": "hsl(var(--primary-strong))",
+        surface: { DEFAULT: "hsl(var(--card))", sunken: "hsl(var(--muted))" },
+        meal: { DEFAULT: "hsl(var(--meal))", soft: "hsl(var(--meal-soft))" },
+        sleep: { DEFAULT: "hsl(var(--sleep))", soft: "hsl(var(--sleep-soft))" },
+        feeling: { DEFAULT: "hsl(var(--feeling))", soft: "hsl(var(--feeling-soft))" },
+        move: { DEFAULT: "hsl(var(--move))", soft: "hsl(var(--move-soft))" },
+        water: { DEFAULT: "hsl(var(--water))", soft: "hsl(var(--water-soft))" },
+        range: {
+          below: "hsl(var(--range-below))",
+          in: "hsl(var(--range-in))",
+          above: "hsl(var(--range-above))",
+        },
+        safety: { DEFAULT: "hsl(var(--safety))", foreground: "hsl(var(--safety-foreground))" },
       },
-      backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-success': 'var(--gradient-success)',
-        'gradient-card': 'var(--gradient-card)',
-      },
-      boxShadow: {
-        'custom-sm': 'var(--shadow-sm)',
-        'custom-md': 'var(--shadow-md)',
-        'custom-lg': 'var(--shadow-lg)',
-      },
-      transitionProperty: {
-        'custom': 'var(--transition)',
+      fontFamily: {
+        serif: ['"Fraunces Variable"', "Fraunces", "Georgia", "serif"],
+        sans: ['"DM Sans"', "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        tile: "22px",
+        card: "24px",
+        "card-lg": "28px",
+        sheet: "32px",
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        lift: "var(--shadow-lift)",
+      },
+      maxWidth: {
+        app: "430px",
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
@@ -93,5 +98,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;

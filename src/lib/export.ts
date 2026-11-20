@@ -1,137 +1,198 @@
-import { GlucoseReading, GlucoseUnit, getGlucoseLevel, convertValue } from '@/types/glucose';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Export for the doctor. Restyled from v1's CSV/PDF export (same CSV builder and jsPDF +
+// autotable day tables), extended with the v2 summary (03 §10). jsPDF is lazy-loaded.
+// No red and no blue: Keeper ink and moss only. Band columns use words, never colour alone.
+import { t } from "@/copy/en";
+import { bandLabelKey, formatGlucose, type TargetRange } from "@/lib/clinical/thresholds";
+import { localDay, minutesBetween } from "@/lib/rules/time";
+import type { CheckIn, FastSession, GlucoseReading, GlucoseUnit, LogEntry, MealData, Settings, SleepData } from "@/types/domain";
 
-export const exportToCSV = (readings: GlucoseReading[], unit: GlucoseUnit): void => {
-  const headers = ['Date', 'Time', `Glucose (${unit})`, 'Level', 'Note'];
-  const rows = readings.map(r => {
-    const date = new Date(r.timestamp);
-    const level = getGlucoseLevel(r.value);
-    const displayValue = convertValue(r.value, unit);
-    return [
-      date.toLocaleDateString(),
-      date.toLocaleTimeString(),
-      displayValue.toString(),
-      level.toUpperCase(),
-      r.note || ''
-    ];
-  });
+const INK: [number, number, number] = [42, 40, 51];
+const MOSS: [number, number, number] = [74, 115, 86];
+const MUTED: [number, number, number] = [98, 94, 105];
+const OAT: [number, number, number] = [239, 232, 220];
 
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-  ].join('\n');
+export interface ExportInput {
+  from: Date;
+  to: Date;
+  logs: LogEntry[];
+  checkins: CheckIn[];
+  readings: GlucoseReading[];
+  fasts: FastSession[];
+  settings: Settings;
+  includeSealed: boolean;
+}
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `glucose-readings-${new Date().toISOString().split('T')[0]}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+const inRange = (iso: string, from: Date, to: Date) => {
+  const d = new Date(iso);
+  return d >= from && d <= to;
 };
+const date = (iso: string) => new Date(iso).toLocaleDateString();
+const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-export const exportToPDF = (readings: GlucoseReading[], unit: GlucoseUnit): void => {
+/** Readings in range; sealed ones only if the person chose to include them. */
+export function exportReadings(readings: GlucoseReading[], from: Date, to: Date, includeSealed: boolean): GlucoseReading[] {
+  return readings.filter((r) => inRange(r.at, from, to) && (includeSealed || r.state !== "sealed")).sort((a, b) => a.at.localeCompare(b.at));
+}
+
+function readingCells(r: GlucoseReading, unit: GlucoseUnit, range: TargetRange): string[] {
+  const value = r.valueMgdl == null ? t.export.sealedValue : `${formatGlucose(r.valueMgdl, unit)} ${unit}`;
+  const band = r.valueMgdl == null ? "" : t.reading.labels[bandLabelKey(r.valueMgdl, range)];
+  const context = r.context ? t.check.contexts[r.context] : "";
+  return [date(r.at), time(r.at), value, band, context, r.note ?? ""];
+}
+
+// ---------- CSV (v1 exportToCSV, adapted) ----------
+export function readingsCsv(readings: GlucoseReading[], unit: GlucoseUnit, range: TargetRange): string {
+  const headers = [...t.export.readingCols];
+  const rows = readings.map((r) => readingCells(r, unit, range));
+  return [headers.join(","), ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))].join("\n");
+}
+
+// ---------- Summary numbers ----------
+export function summarize(input: ExportInput) {
+  const { from, to } = input;
+  const logs = input.logs.filter((l) => inRange(l.at, from, to));
+  const days = Math.max(1, Math.round(minutesBetween(from, to) / (24 * 60)));
+  const meals = logs.filter((l): l is LogEntry<MealData> => l.data.kind === "meal");
+  const sleeps = logs.filter((l): l is LogEntry<SleepData> => l.data.kind === "sleep");
+  const checkins = input.checkins.filter((c) => inRange(c.at, from, to));
+  const energy = { sleepy: 0, steady: 0, buzzy: 0 };
+  for (const c of checkins) energy[c.energy]++;
+  const habits = logs.filter((l) => l.data.kind === "move" && !!l.data.habitId).length;
+  const fasts = input.fasts.filter((f) => inRange(f.startedAt, from, to)).sort((a, b) => a.startedAt.localeCompare(b.startedAt));
+  const loggedDays = new Set(logs.map((l) => localDay(l.at))).size;
+  return {
+    days,
+    loggedDays,
+    mealsPerDay: loggedDays ? meals.length / loggedDays : 0,
+    bigShare: meals.length ? meals.filter((m) => m.data.size === "big").length / meals.length : 0,
+    avgSleep: sleeps.length ? sleeps.reduce((a, s) => a + s.data.hours, 0) / sleeps.length : null,
+    energy,
+    checkinCount: checkins.length,
+    habits,
+    fasts,
+    readings: exportReadings(input.readings, from, to, input.includeSealed),
+  };
+}
+
+// ---------- PDF (v1 exportToPDF, restyled and extended) ----------
+export async function summaryPdf(input: ExportInput): Promise<Blob> {
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+  const s = summarize(input);
+  const { settings } = input;
   const doc = new jsPDF();
-  
-  // Title
+  let y = 20;
+
   doc.setFontSize(20);
-  doc.setTextColor(33, 150, 243);
-  doc.text('Blood Glucose Readings', 14, 20);
-  
-  // Date range
+  doc.setTextColor(...INK);
+  doc.text(t.export.pdfTitle, 14, y);
+  y += 8;
   doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
-  
-  // Statistics
-  const values = readings.map(r => r.value);
-  const avgMgdl = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
-  const avg = convertValue(avgMgdl, unit).toFixed(1);
-  const minMgdl = values.length > 0 ? Math.min(...values) : 0;
-  const min = convertValue(minMgdl, unit);
-  const maxMgdl = values.length > 0 ? Math.max(...values) : 0;
-  const max = convertValue(maxMgdl, unit);
-  
-  doc.setFontSize(11);
-  doc.setTextColor(0);
-  doc.text(`Total Readings: ${readings.length}`, 14, 38);
-  doc.text(`Average: ${avg} ${unit}`, 14, 45);
-  doc.text(`Range: ${min} - ${max} ${unit}`, 14, 52);
-  
-  // Group readings by date
-  const readingsByDate = new Map<string, GlucoseReading[]>();
-  readings.forEach(r => {
-    const date = new Date(r.timestamp).toLocaleDateString();
-    if (!readingsByDate.has(date)) {
-      readingsByDate.set(date, []);
-    }
-    readingsByDate.get(date)!.push(r);
-  });
+  doc.setTextColor(...MUTED);
+  doc.text(`${t.export.pdfFor(settings.name)} · ${t.export.pdfRange(date(input.from.toISOString()), date(input.to.toISOString()))}`, 14, y);
+  y += 5;
+  doc.text(t.export.pdfGenerated(new Date().toLocaleString()), 14, y);
+  y += 8;
 
-  // Sort dates
-  const sortedDates = Array.from(readingsByDate.keys()).sort((a, b) => {
-    return new Date(b).getTime() - new Date(a).getTime();
-  });
+  const pct = (x: number) => `${Math.round(x * 100)}%`;
+  const fastsDone = s.fasts.filter((f) => f.endedAt && !f.endedEarly).length;
+  const fastsEarly = s.fasts.filter((f) => f.endedEarly).length;
+  const fastsSymptom = s.fasts.filter((f) => f.endReason === "symptom" || f.endReason === "reading").length;
+  const sx = t.export.sections;
+  const overview: string[][] = [
+    [sx.days, `${s.loggedDays} / ${s.days}`],
+    [sx.meals, s.mealsPerDay.toFixed(1)],
+    [sx.bigMeals, pct(s.bigShare)],
+    [sx.sleep, s.avgSleep == null ? t.export.none : `${s.avgSleep.toFixed(1)} h`],
+    [sx.energy, s.checkinCount ? `${t.energy.sleepy} ${s.energy.sleepy} · ${t.energy.steady} ${s.energy.steady} · ${t.energy.buzzy} ${s.energy.buzzy}` : t.export.none],
+    [sx.habits, String(s.habits)],
+    [sx.fasting, s.fasts.length ? `${s.fasts.length} · ${t.export.fastEnd.planned} ${fastsDone} · ${t.export.fastEnd.chose} ${fastsEarly} · ${t.export.fastEnd.symptom} ${fastsSymptom}` : t.export.none],
+  ];
+  const f = settings.fasting;
+  if (f.medsLowRisk || f.medsSglt2) {
+    const yn = (v?: string) => (v === "yes" ? t.common.yes : v === "no" ? t.common.no : v === "not-sure" ? t.common.notSure : "–");
+    overview.push([sx.fastingSafety, `${t.fasting.q1} ${yn(f.medsLowRisk)} · ${t.fasting.q2} ${yn(f.medsSglt2)}${f.careTeamConfirmed ? ` · ${t.fasting.confirm}` : ""}`]);
+  }
 
-  let startY = 60;
-  
-  sortedDates.forEach((dateStr, index) => {
-    const dayReadings = readingsByDate.get(dateStr)!;
-    
-    // Add page break if needed
-    if (startY > 250) {
-      doc.addPage();
-      startY = 20;
-    }
-    
-    // Date header
+  autoTable(doc, {
+    startY: y,
+    body: overview,
+    theme: "plain",
+    styles: { fontSize: 10, cellPadding: 2, textColor: INK },
+    columnStyles: { 0: { cellWidth: 55, fontStyle: "bold" } },
+    margin: { left: 14 },
+  });
+  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+
+  if (s.fasts.length) {
     doc.setFontSize(12);
-    doc.setTextColor(33, 150, 243);
-    doc.text(dateStr, 14, startY);
-    startY += 8;
-    
-    const tableData = dayReadings.map(r => {
-      const time = new Date(r.timestamp).toLocaleTimeString();
-      const level = getGlucoseLevel(r.value);
-      const displayValue = convertValue(r.value, unit);
-      return [
-        time,
-        displayValue.toFixed(unit === 'mmol/L' ? 1 : 0),
-        level.toUpperCase(),
-        r.note || '-'
-      ];
-    });
-    
+    doc.setTextColor(...MOSS);
+    doc.text(sx.fasting, 14, y);
     autoTable(doc, {
-      startY: startY,
-      head: [['Time', `Glucose (${unit})`, 'Level', 'Note']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [33, 150, 243],
-        textColor: 255,
-        fontStyle: 'bold'
-      },
-      styles: {
-        fontSize: 9,
-        cellPadding: 2
-      },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 35, halign: 'center' },
-        2: { cellWidth: 25, halign: 'center' },
-        3: { cellWidth: 'auto' }
-      },
-      margin: { left: 14 }
+      startY: y + 3,
+      head: [[...t.export.fastCols]],
+      body: s.fasts.map((x) => [
+        `${date(x.startedAt)} ${time(x.startedAt)}`,
+        t.fasting.trackNames[x.track],
+        x.endedAt ? (minutesBetween(x.startedAt, x.endedAt) / 60).toFixed(1) : "–",
+        x.endedAt ? t.export.fastEnd[x.endReason ?? (x.endedEarly ? "chose" : "planned")] : "–",
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: MOSS, textColor: 255 },
+      styles: { fontSize: 9, cellPadding: 2, textColor: INK, lineColor: OAT },
+      margin: { left: 14 },
     });
-    
-    startY = (doc as any).lastAutoTable.finalY + 10;
-  });
-  
-  doc.save(`glucose-readings-${new Date().toISOString().split('T')[0]}.pdf`);
-};
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  }
+
+  // Readings, grouped by day as in v1.
+  doc.setFontSize(12);
+  doc.setTextColor(...MOSS);
+  if (y > 250) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.text(sx.readings, 14, y);
+  y += 3;
+  if (!s.readings.length) {
+    doc.setFontSize(10);
+    doc.setTextColor(...MUTED);
+    doc.text(t.export.none, 14, y + 5);
+  } else {
+    autoTable(doc, {
+      startY: y,
+      head: [[...t.export.readingCols]],
+      body: s.readings.map((r) => readingCells(r, settings.unit, settings.targetRange)),
+      theme: "grid",
+      headStyles: { fillColor: MOSS, textColor: 255 },
+      styles: { fontSize: 9, cellPadding: 2, textColor: INK, lineColor: OAT },
+      margin: { left: 14 },
+    });
+  }
+  return doc.output("blob");
+}
+
+/** Web Share API with files, falling back to a download. */
+export async function shareOrDownload(blob: Blob, filename: string, title: string): Promise<void> {
+  const file = new File([blob], filename, { type: blob.type });
+  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+  if (nav.canShare?.({ files: [file] })) {
+    try {
+      await nav.share({ files: [file], title });
+      return;
+    } catch (e) {
+      if ((e as DOMException).name === "AbortError") return;
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export const fileStamp = () => new Date().toISOString().split("T")[0];
