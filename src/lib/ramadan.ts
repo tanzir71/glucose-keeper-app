@@ -57,6 +57,21 @@ export function ramadanPhase(now: Date, r: RamadanSettings, city: { lat: number;
   return { phase: "window", day: dayIndex + 1, times: today, nextSuhoorEnds: tomorrow.suhoorEnds };
 }
 
+/**
+ * During Ramadan, name a meal by the fast: from 15 min before Maghrib to 2 h after is iftar;
+ * from 3 h before the end of suhoor (Fajr − offset) to 15 min after is suhoor.
+ */
+export function ramadanSlot(at: Date, r: RamadanSettings, city: { lat: number; lng: number }): "suhoor" | "iftar" | undefined {
+  const phase = ramadanPhase(at, r, city);
+  if (!phase || phase.phase === "before" || phase.phase === "after") return undefined;
+  const t = dayTimes(at, city, r.method, r.suhoorOffsetMin);
+  const sinceIftar = minutesBetween(t.iftar, at);
+  if (sinceIftar >= -15 && sinceIftar <= 120) return "iftar";
+  const untilSuhoorEnds = minutesBetween(at, t.suhoorEnds);
+  if (untilSuhoorEnds >= -15 && untilSuhoorEnds <= 180) return "suhoor";
+  return undefined;
+}
+
 /** Days until a date, for the pre-Ramadan planning card (from 8 weeks before). */
 export const PRE_RAMADAN_WEEKS = 8;
 

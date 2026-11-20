@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CITIES, dayTimes, ramadanPhase } from "./ramadan";
+import { CITIES, dayTimes, ramadanPhase, ramadanSlot } from "./ramadan";
 
 const DHAKA = CITIES[0];
 const hm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -39,5 +39,24 @@ describe("ramadanPhase", () => {
   });
   it("no start date → null (never predicted)", () => {
     expect(ramadanPhase(new Date(), { method: "Karachi", suhoorOffsetMin: 0 }, DHAKA)).toBeNull();
+  });
+});
+
+describe("ramadanSlot", () => {
+  const r = { startDate: "2026-02-18", days: 30 as const, method: "Karachi" as const, suhoorOffsetMin: 0 };
+  const day = new Date("2026-03-01T12:00:00");
+  const t = dayTimes(day, DHAKA);
+  const plus = (d: Date, m: number) => new Date(d.getTime() + m * 60_000);
+  it("iftar from 15 min before maghrib to 2 h after", () => {
+    expect(ramadanSlot(plus(t.iftar, -15), r, DHAKA)).toBe("iftar");
+    expect(ramadanSlot(plus(t.iftar, 30), r, DHAKA)).toBe("iftar");
+    expect(ramadanSlot(plus(t.iftar, 121), r, DHAKA)).toBeUndefined();
+  });
+  it("suhoor in the 3 h before fajr", () => {
+    expect(ramadanSlot(plus(t.suhoorEnds, -60), r, DHAKA)).toBe("suhoor");
+    expect(ramadanSlot(plus(t.suhoorEnds, -181), r, DHAKA)).toBeUndefined();
+  });
+  it("outside Ramadan: no special slot", () => {
+    expect(ramadanSlot(new Date("2026-04-01T19:00:00"), r, DHAKA)).toBeUndefined();
   });
 });

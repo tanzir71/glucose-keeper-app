@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Camera, Trash2 } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,23 @@ export function MealSheet({ initial, onSave, onDelete, onClose, settings }: Shee
   const photoUrl = usePhotoUrl(photoId);
   const fastingMode = !!settings.fasting.track;
 
-  const slot: MealSlot = useMemo(() => initial?.data.slot ?? inferSlot(at, settings.rhythm), [at, initial, settings.rhythm]);
+  // During Ramadan, meals near maghrib are iftar and before fajr are suhoor (adhan loads lazily).
+  const [ramadanSlotName, setRamadanSlotName] = useState<MealSlot | undefined>();
+  useEffect(() => {
+    const r = settings.fasting.ramadan;
+    if (settings.fasting.track !== "ramadan" || !r?.startDate) return setRamadanSlotName(undefined);
+    let alive = true;
+    import("@/lib/ramadan").then((m) => {
+      if (alive) setRamadanSlotName(m.ramadanSlot(at, { ...m.DEFAULT_RAMADAN, ...r }, settings.rhythm?.city ?? m.CITIES[0]));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [at, settings.fasting.track, settings.fasting.ramadan, settings.rhythm?.city]);
+  const slot: MealSlot = useMemo(
+    () => initial?.data.slot ?? ramadanSlotName ?? inferSlot(at, settings.rhythm),
+    [at, initial, settings.rhythm, ramadanSlotName],
+  );
 
   // Her recent picks join the defaults.
   const recent = useLiveQuery(async () => {
