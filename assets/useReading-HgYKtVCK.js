@@ -1,0 +1,1 @@
+import{c as s,l as t}from"./app-Doxqb2Pr.js";import{c as i}from"./readings-iobmplgk.js";function l(a){return s(async()=>{if(!a)return null;const e=await t.readings.get(a);if(!e)return null;const r=await t.readings.orderBy("at").primaryKeys(),n=e.mealId?await t.logs.get(e.mealId):void 0;return{reading:e,n:r.indexOf(a)+1,context:await i(e),meal:n}},[a])}export{l as u};

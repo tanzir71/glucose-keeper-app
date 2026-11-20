@@ -1,0 +1,18 @@
+{
+  "id": "/glucose-keeper-app/app/",
+  "name": "Glucose Keeper",
+  "short_name": "Keeper",
+  "description": "A soft diary for your days.",
+  "start_url": "/glucose-keeper-app/app/",
+  "scope": "/glucose-keeper-app/app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F1E9",
+  "theme_color": "#F6F1E9",
+  "lang": "en",
+  "icons": [
+    { "src": "/glucose-keeper-app/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/glucose-keeper-app/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/glucose-keeper-app/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

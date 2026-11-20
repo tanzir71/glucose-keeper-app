@@ -1,0 +1,1 @@
+import{j as t,t as o}from"./en-sDluZ_1Q.js";import{F as e,B as n,L as r}from"./app-Doxqb2Pr.js";function l(){return t.jsx(e,{footer:t.jsx(n,{asChild:!0,size:"lg",children:t.jsx(r,{to:"/",children:o.notFound.back})}),children:t.jsx("h1",{className:"t-title mt-16",children:o.notFound.title})})}export{l as default};
