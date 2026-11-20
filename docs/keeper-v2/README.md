@@ -48,7 +48,7 @@ Work through them in order. Each one ends with `npm run build`, `npm run lint` a
 - [x] M0.4 Dexie database, the settings store, and the migration from localStorage (`glucose_readings`, `glucose_unit`). Cover the migration with tests.
 - [x] M0.5 App shell: centred column, status-bar-safe padding, and the TabBar (Today · Week · Learn · You).
 - [x] M0.6 PWA via `vite-plugin-pwa`: manifest name "Glucose Keeper", short name "Keeper", offline shell and icons.
-- [ ] M0.7 ~~GitHub Actions workflow that deploys to Pages (see 03).~~ Dropped at the owner's request: no CI; build locally and push.
+- [ ] M0.7 ~~GitHub Actions workflow that deploys to Pages (see 03).~~ Dropped at the owner's request: no CI. `npm run deploy` builds locally and publishes `dist/` to the `gh-pages` branch.
 - [x] M0.8 `src/lib/clinical/thresholds.ts` and `classifyReading()`, with tests.
 
 **DoD:** the app installs on Android and iOS, opens offline, migrates old readings, and is deployed.

@@ -60,8 +60,10 @@ src/landing/                 the marketing landing page
 docs/keeper-v2/              the handoff spec, OCR spike notes, M6 checklist, clinical review list
 ```
 
-## Building
-`npm run build` writes the landing page and the app to `dist/` (base path `/glucose-keeper-app/`). There's no CI: run `npm run lint`, `npm test -- --run` and `npm run build` before pushing.
+## Building and deploying
+`npm run build` writes the landing page and the app to `dist/` (base path `/glucose-keeper-app/`).
+
+`npm run deploy` builds, then publishes `dist/` to the `gh-pages` branch, which GitHub Pages serves at https://tanzir71.github.io/glucose-keeper-app/. There's no CI: run `npm run lint` and `npm test -- --run` before deploying.
 
 ## Upgrading from v1
 On first open, v1 readings in `localStorage` are copied into IndexedDB, and the Numbers view is switched on so the old history stays visible. The v1 keys are kept until v2.1.
