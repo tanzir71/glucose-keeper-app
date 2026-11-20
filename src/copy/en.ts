@@ -759,6 +759,7 @@ export const en = {
     ],
     stopFooter: "Checking your glucose doesn't break your fast.",
     stopNow: "End the fast now — it still counts",
+    endedBanner: "Your fast has ended — it still counts. Look after yourself first.",
     stopOkay: "I'm okay",
     stopSymptoms: "I have one of these",
     // Doctor plan

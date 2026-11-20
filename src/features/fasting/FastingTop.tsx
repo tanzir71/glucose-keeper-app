@@ -1,6 +1,5 @@
-import { useEffect, useRef } from "react";
 import { ChevronRight, Leaf, Plus, ShieldCheck } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/keeper/Chip";
@@ -8,7 +7,8 @@ import { Overline } from "@/components/keeper/Controls";
 import { Ring } from "@/components/keeper/Visuals";
 import { DateAvatar } from "@/features/today/TodayTop";
 import { addFastDrink, addFastFeeling, endFast, startFast } from "@/lib/fastingStore";
-import { canStart, eatingWindow, fastProgress, nextFastStart, offerNextStep, shouldStopFast, weightSoftening } from "@/lib/rules/fasting";
+import { canStart, eatingWindow, fastProgress, nextFastStart, offerNextStep, weightSoftening } from "@/lib/rules/fasting";
+import { useStopRules } from "./useStopRules";
 import { minutesBetween } from "@/lib/rules/time";
 import { updateSettings } from "@/lib/settings";
 import { fmtHM, fmtTime } from "@/lib/format";
@@ -98,7 +98,6 @@ export function FastingTop({
   readings: GlucoseReading[];
   logs: LogEntry[];
 }) {
-  const navigate = useNavigate();
   const p = fastProgress(session, now);
   const w = eatingWindow(session.track, settings.fasting.windowStart);
   const doctor = session.track === "doctor-plan";
@@ -106,19 +105,10 @@ export function FastingTop({
   const lastFeeling = [...session.feelings].reverse().find((f) => minutesBetween(f.at, now) < 60)?.tag;
   const count = (d: "water" | "tea" | "coffee") => session.drinks.filter((x) => x.drink === d).length;
 
-  // Stop rules: a reading or feeling that breaks the fast opens the stop sheet once.
-  const stop = shouldStopFast({ session, readings, logs });
-  const opened = useRef<string>();
-  useEffect(() => {
-    if (!stop.stop || opened.current === session.id) return;
-    opened.current = session.id;
-    navigate(`/fasting/stop?reason=${stop.trigger}`);
-  }, [stop, session.id, navigate]);
+  // Stop rules end the fast and open the stop sheet ("Shaky or dizzy" fires it at once).
+  useStopRules(session, readings, logs);
 
-  const feel = async (f: FastFeeling) => {
-    await addFastFeeling(session.id, f);
-    if (f === "shaky-dizzy") navigate("/fasting/stop?reason=shaky-dizzy");
-  };
+  const feel = (f: FastFeeling) => addFastFeeling(session.id, f);
   const end = async () => {
     await endFast(session, "chose");
     toast(t.fasting.ended);

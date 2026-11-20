@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { SafetyScreen } from "@/components/keeper/SafetyScreen";
 import { useActiveFast } from "@/lib/data";
 import { endFast } from "@/lib/fastingStore";
-import { formatGlucose } from "@/lib/clinical/thresholds";
+import { breaksFast, formatGlucose } from "@/lib/clinical/thresholds";
 import { emergencyNumber } from "@/lib/readings";
 import { useSettings } from "@/lib/settings";
 import { t } from "@/copy/en";
@@ -22,6 +22,13 @@ export default function Safety() {
   const unwell = id === "unwell";
   const view = useReading(unwell ? undefined : id);
   const [showNumber, setShowNumber] = useState(false);
+  const [endedNow, setEndedNow] = useState(false);
+
+  // Reporting symptoms is a stop rule (05 §4.6): end any running fast. It still counts.
+  useEffect(() => {
+    if (!unwell || !activeFast || activeFast.endedAt) return;
+    void endFast(activeFast, "symptom").then(() => setEndedNow(true));
+  }, [unwell, activeFast]);
 
   if (!settings || activeFast === undefined || (!unwell && view === undefined)) return <div className="min-h-dvh bg-safety" />;
   if (!unwell && view === null) return <Navigate to="/" replace />;
@@ -32,8 +39,10 @@ export default function Safety() {
   if (!variant) return <Navigate to={`/glucose/reading/${id}`} replace />;
 
   const fast = activeFast && !activeFast.endedAt ? activeFast : null;
+  // A reading that breaks the fast already ended it when it was saved (lib/readings.ts).
+  const endedForReading = !fast && reading?.context === "fasting" && reading.valueMgdl != null && breaksFast(reading.valueMgdl);
   const stopFast = async () => {
-    if (fast) await endFast(fast, variant === "unwell" ? "symptom" : "reading");
+    if (fast) await endFast(fast, "reading");
   };
 
   const copy =
@@ -51,6 +60,11 @@ export default function Safety() {
       note={copy.note}
       extra={
         <>
+          {(endedForReading || endedNow) && (
+            <p className="t-body-strong mt-5 rounded-card bg-safety-foreground/[0.12] p-4" role="status">
+              {t.fasting.endedBanner}
+            </p>
+          )}
           {fast && (
             <div className="mt-5 rounded-card bg-safety-foreground/[0.12] p-4">
               <p className="t-body-strong">{t.safety.duringFast}</p>

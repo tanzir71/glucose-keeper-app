@@ -1,7 +1,8 @@
 // Sealed-reading flow (05 §2): how a new reading is stored and where it goes next.
 // Safety beats gentleness: a reading outside the safety bounds is never sealed or hidden.
 import { db, newId } from "@/lib/db";
-import { classifyReading, EMERGENCY_NUMBERS, type TargetRange } from "@/lib/clinical/thresholds";
+import { breaksFast, classifyReading, EMERGENCY_NUMBERS, type TargetRange } from "@/lib/clinical/thresholds";
+import { endFast } from "@/lib/fastingStore";
 import { minutesBetween, deviceTimeZone } from "@/lib/rules/time";
 import { t } from "@/copy/en";
 import type { FastSession, GlucoseComfort, GlucoseReading, LogEntry, MealData, ReadingContext, Settings } from "@/types/domain";
@@ -65,6 +66,9 @@ export async function saveReading(input: {
     mealId: ctx.mealId,
   };
   await db.readings.add(reading);
+  // Stop rule (05 §4.6): a reading under 70 or over 300 mg/dL ends any running fast. It still counts.
+  const fast = input.activeFast;
+  if (fast && !fast.endedAt && input.valueMgdl != null && breaksFast(input.valueMgdl)) await endFast(fast, "reading", at);
   return { reading, decision };
 }
 

@@ -90,7 +90,7 @@ export default function Today() {
     <TabScreen>
       <Suspense fallback={<div className="h-32" />}>
         {track === "ramadan" ? (
-          <RamadanTop settings={settings} now={now} sessions={recent.fasts} />
+          <RamadanTop settings={settings} now={now} sessions={recent.fasts} readings={recent.readings} logs={data.logs24} />
         ) : fast ? (
           <FastingTop settings={settings} now={now} session={fast} readings={recent.readings} logs={data.logs24} />
         ) : (

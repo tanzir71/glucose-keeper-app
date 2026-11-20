@@ -12,8 +12,9 @@ import { updateSettings } from "@/lib/settings";
 import { fmtDate, fmtTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { t } from "@/copy/en";
-import type { FastSession, Settings } from "@/types/domain";
+import type { FastSession, GlucoseReading, LogEntry, Settings } from "@/types/domain";
 import { StopRulesLink } from "./FastingTop";
+import { useStopRules } from "./useStopRules";
 
 function Countdown({ label, target, now, line }: { label: string; target: Date; now: Date; line: string }) {
   const mins = Math.max(0, minutesBetween(now, target));
@@ -48,7 +49,19 @@ function PlanCard() {
  * C4 Ramadan Today (Figma 15:521). The day is reshaped around the fast: suhoor/iftar times, no
  * food nudges while fasting, "Break your fast if…" always one tap away.
  */
-export function RamadanTop({ settings, now, sessions }: { settings: Settings; now: Date; sessions: FastSession[] }) {
+export function RamadanTop({
+  settings,
+  now,
+  sessions,
+  readings,
+  logs,
+}: {
+  settings: Settings;
+  now: Date;
+  sessions: FastSession[];
+  readings: GlucoseReading[];
+  logs: LogEntry[];
+}) {
   const r = { ...DEFAULT_RAMADAN, ...settings.fasting.ramadan };
   const city = settings.rhythm?.city ?? CITIES[0];
   const phase: RamadanPhase | null = ramadanPhase(now, r, city);
@@ -66,6 +79,9 @@ export function RamadanTop({ settings, now, sessions }: { settings: Settings; no
     created.current = todayKey;
     void startFast("ramadan", settings, fastingTimes.suhoorEnds, fastingTimes.iftar);
   }, [fastingTimes, todays, todayKey, settings]);
+
+  // Stop rules apply to Ramadan fasts too (IDF–DAR "Break your fast if…").
+  useStopRules(todays && !todays.endedAt ? todays : undefined, readings, logs);
 
   const setWater = (n: number) =>
     updateSettings((s) => ({ fasting: { ...s.fasting, ramadan: { ...DEFAULT_RAMADAN, ...s.fasting.ramadan, water: { ...(s.fasting.ramadan?.water ?? {}), [todayKey]: n } } } }));

@@ -16,6 +16,7 @@ export default function StopSheet() {
   const fast = useActiveFast();
   const ramadan = params.get("ramadan") === "1" || fast?.track === "ramadan";
   const reason = params.get("reason");
+  const ended = params.get("ended") === "1";
   const close = () => navigate("/", { replace: true });
 
   const stopNow = async () => {
@@ -45,6 +46,11 @@ export default function StopSheet() {
         </div>
       }
     >
+      {ended && (
+        <p className="t-body-strong mb-3 rounded-card bg-primary-soft p-4 text-primary-strong" role="status">
+          {t.fasting.endedBanner}
+        </p>
+      )}
       <ul className="space-y-3">
         {t.fasting.stopRules.map((r) => (
           <li key={r} className="t-body-l flex gap-3 rounded-card bg-card p-4">
