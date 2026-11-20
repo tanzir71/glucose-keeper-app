@@ -1,8 +1,8 @@
 // App bootstrap (app/index.html). The landing page has its own entry in src/landing/main.tsx.
 import { createRoot } from "react-dom/client";
 // Self-hosted fonts (local-first: no font CDN).
-import "@fontsource-variable/fraunces";
-import "@fontsource-variable/fraunces/wght-italic.css";
+import "@fontsource-variable/fraunces/opsz.css";
+import "@fontsource-variable/fraunces/opsz-italic.css";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/500.css";
 import "@fontsource/dm-sans/600.css";
