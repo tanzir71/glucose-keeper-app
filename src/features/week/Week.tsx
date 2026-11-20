@@ -53,7 +53,7 @@ export default function Week() {
 
   const tellMore = async () => {
     await updateSettings((s) => ({ invitation: { ...s.invitation, lastShownAt: new Date().toISOString() } }));
-    navigate("/glucose/comfort");
+    navigate("/glucose/comfort", { state: { from: "invitation" } });
   };
   const notNow = () => updateSettings((s) => ({ invitation: { ...s.invitation, snoozedUntil: addDays(new Date(), 14).toISOString() } }));
   const never = () => updateSettings((s) => ({ invitation: { ...s.invitation, dismissedForever: true } }));

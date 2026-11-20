@@ -22,6 +22,13 @@ const YouRhythm = lazy(() => import("@/features/you/YouRhythm"));
 const YouRange = lazy(() => import("@/features/you/YouRange"));
 const ExportPage = lazy(() => import("@/features/you/ExportPage"));
 const NotFound = lazy(() => import("@/features/you/NotFound"));
+const Comfort = lazy(() => import("@/features/glucose/Comfort"));
+const Check = lazy(() => import("@/features/glucose/Check"));
+const Sealed = lazy(() => import("@/features/glucose/Sealed"));
+const Reading = lazy(() => import("@/features/glucose/Reading"));
+const Safety = lazy(() => import("@/features/glucose/Safety"));
+const SafetyTimer = lazy(() => import("@/features/glucose/SafetyTimer"));
+const Numbers = lazy(() => import("@/features/glucose/numbers/Numbers"));
 
 function Splash() {
   return <div className="min-h-dvh bg-background" aria-busy="true" />;
@@ -50,7 +57,7 @@ export default function App() {
   if (!ready) return <Splash />;
 
   return (
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Guard>
         <PromptWatcher />
         <Suspense fallback={<Splash />}>
@@ -74,6 +81,14 @@ export default function App() {
             <Route path="/you/rhythm" element={<YouRhythm />} />
             <Route path="/you/range" element={<YouRange />} />
             <Route path="/you/export" element={<ExportPage />} />
+
+            <Route path="/glucose/comfort" element={<Comfort />} />
+            <Route path="/glucose/check" element={<Check />} />
+            <Route path="/glucose/sealed/:id" element={<Sealed />} />
+            <Route path="/glucose/reading/:id" element={<Reading />} />
+            <Route path="/glucose/safety/:id" element={<Safety />} />
+            <Route path="/glucose/timer" element={<SafetyTimer />} />
+            <Route path="/glucose/numbers" element={<Numbers />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

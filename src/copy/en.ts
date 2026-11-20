@@ -165,6 +165,8 @@ export const en = {
     envelopesOpen: "See envelopes",
     avatarLabel: "You",
     habitLeaf: "Tiny habit",
+    checkGlucose: "Check your glucose",
+    checkGlucoseBody: "Sealed until you choose to open it.",
   },
 
   timeline: {
@@ -419,6 +421,7 @@ export const en = {
     blurred: "Blurred instantly",
     shutter: "Take a photo of your meter",
     type: "Type the number instead",
+    snapInstead: "Snap your meter instead",
     reading: "Reading it on your phone…",
     contextTitle: "When was this?",
     contexts: {
@@ -544,6 +547,7 @@ export const en = {
     prevDay: "Previous day",
     nextDay: "Next day",
     sealedRow: "Sealed envelope",
+    export: "Export",
   },
 
   // ---------- Learn ----------

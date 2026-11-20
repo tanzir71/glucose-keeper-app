@@ -92,6 +92,18 @@ export default function Today() {
           )}
           {showMore && hiddenTiles.map((k) => <LogTile key={k} kind={k} onClick={() => open(k)} />)}
         </div>
+        {settings.ladderStep >= 4 && (
+          <Link
+            to="/glucose/check"
+            className="mt-4 flex min-h-11 items-center gap-3 rounded-[20px] bg-card px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Mail aria-hidden className="h-5 w-5 text-primary-strong" />
+            <span className="flex-1">
+              <span className="t-body-strong block">{t.today.checkGlucose}</span>
+              {settings.glucoseComfort === "sealed" && <span className="t-caption text-muted-foreground">{t.today.checkGlucoseBody}</span>}
+            </span>
+          </Link>
+        )}
       </section>
 
       {nudge && (
