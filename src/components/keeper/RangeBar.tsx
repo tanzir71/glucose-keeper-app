@@ -9,7 +9,7 @@ const TOTAL = W.below + W.in + W.above;
 const DISPLAY_MIN = 40;
 const DISPLAY_MAX = 300;
 
-export function markerPercent(v: number, r: TargetRange): number {
+function markerPercent(v: number, r: TargetRange): number {
   const clamp = (x: number) => Math.max(0, Math.min(1, x));
   let px: number;
   if (v < r.lowMgdl) px = W.below * clamp((v - DISPLAY_MIN) / (r.lowMgdl - DISPLAY_MIN));

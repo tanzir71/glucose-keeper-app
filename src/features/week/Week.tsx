@@ -15,7 +15,7 @@ import { weeklyInsights } from "@/lib/rules/insights";
 import { addDays, localDay } from "@/lib/rules/time";
 import { fmtDayMonth, fmtDayTime, weekdayInitial } from "@/lib/format";
 import { showsGlucose, updateSettings, useSettings } from "@/lib/settings";
-import { patchesFor } from "@/features/today/Timeline";
+import { patchesFor } from "@/features/today/logView";
 import { WeightCard } from "@/features/fasting/WeightCard";
 import { t } from "@/copy/en";
 

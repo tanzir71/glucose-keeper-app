@@ -5,7 +5,8 @@ import { FlowScreen } from "@/components/keeper/Layout";
 import { updateSettings, useSettings } from "@/lib/settings";
 import { t } from "@/copy/en";
 import type { Rhythm } from "@/types/domain";
-import { RhythmForm, rhythmIsEmpty } from "./RhythmForm";
+import { RhythmForm } from "./RhythmForm";
+import { rhythmIsEmpty } from "./rhythm";
 import { StepDots } from "./StepDots";
 
 const DRAFT_KEY = "keeper.rhythmDraft";

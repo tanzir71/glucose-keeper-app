@@ -8,15 +8,7 @@ import type { Nudge } from "@/lib/rules/smart-timing";
 import { updateSettings } from "@/lib/settings";
 import { t } from "@/copy/en";
 import { HabitSafetyDialog } from "./HabitSafetyDialog";
-
-export function habitPath(n: Pick<Nudge, "habitId" | "durationSec" | "reps" | "mealId" | "place">) {
-  const q = new URLSearchParams();
-  if (n.durationSec) q.set("min", String(Math.round(n.durationSec / 60)));
-  if (n.reps) q.set("reps", String(n.reps));
-  if (n.mealId) q.set("meal", n.mealId);
-  q.set("place", n.place);
-  return `/habit/${n.habitId}?${q.toString()}`;
-}
+import { habitPath } from "./habitPath";
 
 /** B1 smart nudge card: overline, body, "Let's do it" / "Not now", and "Why this?". */
 export function NudgeCard({ nudge, safetyNoteSeen }: { nudge: Nudge; safetyNoteSeen: boolean }) {

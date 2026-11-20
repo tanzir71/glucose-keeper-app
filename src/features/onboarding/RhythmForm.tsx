@@ -178,6 +178,3 @@ export function RhythmForm({ value, onChange, extended }: { value: Rhythm; onCha
     </div>
   );
 }
-
-export const rhythmIsEmpty = (r: Rhythm) =>
-  !r.wake && !r.sleep && !Object.values(r.meals ?? {}).some(Boolean) && !r.workday && !(r.anchors?.length) && !r.fastingDays;

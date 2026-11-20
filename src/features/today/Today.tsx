@@ -20,7 +20,8 @@ import { showsGlucose, useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { t } from "@/copy/en";
 import type { LogKind, Settings } from "@/types/domain";
-import { Timeline, patchesFor } from "./Timeline";
+import { Timeline } from "./Timeline";
+import { patchesFor } from "./logView";
 import { TodayTop } from "./TodayTop";
 import { InstallCard } from "./InstallCard";
 
