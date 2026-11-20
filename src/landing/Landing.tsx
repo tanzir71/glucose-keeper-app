@@ -60,7 +60,7 @@ function H2({ id, children, className }: { id: string; children: ReactNode; clas
 
 function Logo() {
   return (
-    <a href={`${BASE}`} className="flex min-h-11 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Keeper home">
+    <a href={`${BASE}`} className="flex min-h-11 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={L.nav.home}>
       <span aria-hidden className="grid grid-cols-2 gap-[3px]">
         <span className="h-3 w-3 rounded-[4px] bg-meal" />
         <span className="h-3 w-3 rounded-[4px] bg-sleep" />
@@ -479,7 +479,7 @@ function Footer() {
       <Container>
         <div className="flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
           <Logo />
-          <nav aria-label="Footer">
+          <nav aria-label={L.nav.footer}>
             <ul className="flex flex-wrap gap-x-8 gap-y-2">
               {links.map(([href, label]) => (
                 <li key={label}>
@@ -502,7 +502,7 @@ export default function Landing() {
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-card focus:px-4 focus:py-2">
-        Skip to content
+        {L.nav.skip}
       </a>
       <Nav />
       <main id="main">

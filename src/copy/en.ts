@@ -51,7 +51,7 @@ export const en = {
     deleteEntry: "Delete this entry",
   },
 
-  tabs: { today: "Today", week: "Week", learn: "Learn", you: "You" },
+  tabs: { today: "Today", week: "Week", learn: "Learn", you: "You", nav: "Main" },
 
   kinds: {
     meal: "Meal",
@@ -841,7 +841,7 @@ export const en = {
 
   // ---------- Landing page (Figma 23:3) ----------
   landing: {
-    nav: { how: "How it works", features: "Features", fasting: "Fasting", safety: "Safety", faq: "FAQ", open: "Open Keeper", menu: "Sections" },
+    nav: { how: "How it works", features: "Features", fasting: "Fasting", safety: "Safety", faq: "FAQ", open: "Open Keeper", menu: "Sections", home: "Keeper home", footer: "Footer", skip: "Skip to content" },
     hero: {
       pill: "A soft diary for people living with diabetes",
       title1: "Track your days,",

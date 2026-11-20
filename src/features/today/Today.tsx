@@ -112,7 +112,7 @@ export default function Today() {
         <Overline as="h2">
           <span id="add-to-today">{t.today.addToToday}</span>
         </Overline>
-        <div className="mt-3 grid grid-cols-5 justify-items-center gap-y-4">
+        <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(3.9rem,1fr))] justify-items-center gap-y-4">
           {tiles.map((k) => (
             <LogTile key={k} kind={k} onClick={() => open(k)} highlight={empty} />
           ))}
@@ -121,9 +121,9 @@ export default function Today() {
               type="button"
               aria-expanded={showMore}
               onClick={() => setShowMore((v) => !v)}
-              className="group flex w-[62px] flex-col items-center gap-1.5 focus-visible:outline-none"
+              className="group flex w-[3.875rem] flex-col items-center gap-1.5 focus-visible:outline-none"
             >
-              <span className="flex h-[58px] w-[58px] items-center justify-center rounded-tile border-[1.5px] border-dashed border-border group-focus-visible:ring-2 group-focus-visible:ring-ring">
+              <span className="flex h-[3.625rem] w-[3.625rem] items-center justify-center rounded-tile border-[1.5px] border-dashed border-border group-focus-visible:ring-2 group-focus-visible:ring-ring">
                 <ChevronDown aria-hidden className={cn("h-6 w-6 transition-transform", showMore && "rotate-180")} strokeWidth={1.8} />
               </span>
               <span className="t-label text-muted-foreground">{t.today.more}</span>

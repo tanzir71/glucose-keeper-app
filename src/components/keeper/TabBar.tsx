@@ -14,7 +14,7 @@ const ITEMS = [
 export function TabBar() {
   return (
     <nav
-      aria-label="Main"
+      aria-label={t.tabs.nav}
       className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-border bg-card"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
     >

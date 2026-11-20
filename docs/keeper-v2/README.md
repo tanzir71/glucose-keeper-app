@@ -39,63 +39,65 @@ A marketing **landing page** explains all of this.
 Work through them in order. Each one ends with `npm run build`, `npm run lint` and `npm test` passing, plus a short demo note in the PR.
 
 ### M0: Foundation
-- [ ] M0.1 Add Vitest, Testing Library, jsdom and fake-indexeddb, plus an `npm test` script.
-- [ ] M0.2 Design tokens: replace `:root` in `src/index.css` and extend `tailwind.config.ts` (see 02). Self-host the fonts.
-- [ ] M0.3 Multi-page Vite build:
+- [x] M0.1 Add Vitest, Testing Library, jsdom and fake-indexeddb, plus an `npm test` script.
+- [x] M0.2 Design tokens: replace `:root` in `src/index.css` and extend `tailwind.config.ts` (see 02). Self-host the fonts.
+- [x] M0.3 Multi-page Vite build:
   - landing at `/`, app at `/app/`
   - `base: '/glucose-keeper-app/'`
   - `HashRouter` inside the app
-- [ ] M0.4 Dexie database, the settings store, and the migration from localStorage (`glucose_readings`, `glucose_unit`). Cover the migration with tests.
-- [ ] M0.5 App shell: centred column, status-bar-safe padding, and the TabBar (Today · Week · Learn · You).
-- [ ] M0.6 PWA via `vite-plugin-pwa`: manifest name "Glucose Keeper", short name "Keeper", offline shell and icons.
-- [ ] M0.7 GitHub Actions workflow that deploys to Pages (see 03).
-- [ ] M0.8 `src/lib/clinical/thresholds.ts` and `classifyReading()`, with tests.
+- [x] M0.4 Dexie database, the settings store, and the migration from localStorage (`glucose_readings`, `glucose_unit`). Cover the migration with tests.
+- [x] M0.5 App shell: centred column, status-bar-safe padding, and the TabBar (Today · Week · Learn · You).
+- [x] M0.6 PWA via `vite-plugin-pwa`: manifest name "Glucose Keeper", short name "Keeper", offline shell and icons.
+- [x] M0.7 GitHub Actions workflow that deploys to Pages (see 03).
+- [x] M0.8 `src/lib/clinical/thresholds.ts` and `classifyReading()`, with tests.
 
 **DoD:** the app installs on Android and iOS, opens offline, migrates old readings, and is deployed.
 
 ### M1: Diary ("Start gently" + a normal day)
-- [ ] M1.1 A1 Welcome, A2 What feels easy, A3 Your rhythm (skippable)
-- [ ] M1.2 B1 Today: date, greeting, today's patch strip, five log tiles, timeline
-- [ ] M1.3 B2 Log a meal sheet: photo or quick pick, size, feeling. Photos are compressed and EXIF-stripped.
-- [ ] M1.4 Sleep, Feeling, Move and Water sheets (undesigned; follow the B2 pattern, see 01)
-- [ ] M1.5 B3 After-meal check-in. Prompted in-app when the app is opened 100–180 min after a meal.
-- [ ] M1.6 D1 Week: quilt, up to 2 insights (rules in 04). No invitation yet.
-- [ ] M1.7 You tab basics: units, export (restyled), "Delete all my data"
+- [x] M1.1 A1 Welcome, A2 What feels easy, A3 Your rhythm (skippable)
+- [x] M1.2 B1 Today: date, greeting, today's patch strip, five log tiles, timeline
+- [x] M1.3 B2 Log a meal sheet: photo or quick pick, size, feeling. Photos are compressed and EXIF-stripped.
+- [x] M1.4 Sleep, Feeling, Move and Water sheets (undesigned; follow the B2 pattern, see 01)
+- [x] M1.5 B3 After-meal check-in. Prompted in-app when the app is opened 100–180 min after a meal.
+- [x] M1.6 D1 Week: quilt, up to 2 insights (rules in 04). No invitation yet.
+- [x] M1.7 You tab basics: units, export (restyled), "Delete all my data"
 
 **DoD:** someone can use Keeper for a week without ever seeing a glucose number.
 
 ### M2: Tiny habits + Smart timing
-- [ ] M2.1 Tiny habits toggle (A2, You). Off by default. Show the safety note before the first habit.
-- [ ] M2.2 `pickNudge()` rules engine plus its full test table (04)
-- [ ] M2.3 Nudge card on Today with "Why this?", Not now and Let's do it
-- [ ] M2.4 B4 timer and count screens. "End early — it still counts". A finished habit becomes a Move log with `habitId`.
-- [ ] M2.5 Habit library (You → Tiny habits), with evidence tags and "Reset what Keeper learned"
+- [x] M2.1 Tiny habits toggle (A2, You). Off by default. Show the safety note before the first habit.
+- [x] M2.2 `pickNudge()` rules engine plus its full test table (04)
+- [x] M2.3 Nudge card on Today with "Why this?", Not now and Let's do it
+- [x] M2.4 B4 timer and count screens. "End early — it still counts". A finished habit becomes a Move log with `habitId`.
+- [x] M2.5 Habit library (You → Tiny habits), with evidence tags and "Reset what Keeper learned"
 
 ### M3: The glucose ladder
-- [ ] M3.0 **Spike first.** Test on-device OCR of meter photos (see 03). Record the accuracy on 20+ sample photos in the PR.
-- [ ] M3.1 Invitation engine plus the D1 invitation card (04)
-- [ ] M3.2 D2 Glucose comfort (sealed / ranges / numbers). Add a Learn tab with three 30-second cards.
-- [ ] M3.3 D3 Snap & seal (camera → blur → OCR → classify). Include the "Type it instead" path.
-- [ ] M3.4 D4 Sealed envelope, and an envelopes list in Week
-- [ ] M3.5 D5 Opened in ranges (range bar). The number stays behind "Show the number".
-- [ ] M3.6 D6 Low safety screen, the High safety screen (undesigned), and the 15-minute timer
-- [ ] M3.7 Numbers view: restyle the existing chart, list and export for ladder step 6
+- [ ] M3.0 **Spike first.** *(Pipeline built and measured on synthetic images; real-photo run pending. See [ocr-spike.md](ocr-spike.md).)* Test on-device OCR of meter photos (see 03). Record the accuracy on 20+ sample photos in the PR.
+- [x] M3.1 Invitation engine plus the D1 invitation card (04)
+- [x] M3.2 D2 Glucose comfort (sealed / ranges / numbers). Add a Learn tab with three 30-second cards.
+- [x] M3.3 D3 Snap & seal (camera → blur → OCR → classify). Include the "Type it instead" path.
+- [x] M3.4 D4 Sealed envelope, and an envelopes list in Week
+- [x] M3.5 D5 Opened in ranges (range bar). The number stays behind "Show the number".
+- [x] M3.6 D6 Low safety screen, the High safety screen (undesigned), and the 15-minute timer
+- [x] M3.7 Numbers view: restyle the existing chart, list and export for ladder step 6
 
 ### M4: Fasting mode
-- [ ] M4.1 C1 Fasting mode track picker, plus the exclusion check (type 1, pregnancy or breastfeeding, past eating difficulties)
-- [ ] M4.2 C2 Safety check (medications), care-team confirmation, and the doctor summary export
-- [ ] M4.3 C3 Fasting Today (ring, feelings, drinks, break-fast card, End now)
-- [ ] M4.4 Step-up offer rule, plus the "Break your fast if…" / "End the fast if…" sheet
-- [ ] M4.5 C4 Ramadan Today: city picker and `adhan` times (suhoor ends at Fajr, iftar at Maghrib), iftar plan, water
-- [ ] M4.6 Doctor's-plan track (24 h+) as logging only, and the "Ask your doctor about…" cards
-- [ ] M4.7 Optional weekly weight trend (number hidden by default)
+- [x] M4.1 C1 Fasting mode track picker, plus the exclusion check (type 1, pregnancy or breastfeeding, past eating difficulties)
+- [x] M4.2 C2 Safety check (medications), care-team confirmation, and the doctor summary export
+- [x] M4.3 C3 Fasting Today (ring, feelings, drinks, break-fast card, End now)
+- [x] M4.4 Step-up offer rule, plus the "Break your fast if…" / "End the fast if…" sheet
+- [x] M4.5 C4 Ramadan Today: city picker and `adhan` times (suhoor ends at Fajr, iftar at Maghrib), iftar plan, water
+- [x] M4.6 Doctor's-plan track (24 h+) as logging only, and the "Ask your doctor about…" cards
+- [x] M4.7 Optional weekly weight trend (number hidden by default)
 
 ### M5: Landing page
-- [ ] M5.1 Build `/` from Figma page 04 (node `23:3`). Use static product shots exported from Figma.
-- [ ] M5.2 Responsive behaviour: stack to one column below 900 px. The mobile layout isn't designed; follow the section order.
-- [ ] M5.3 Meta/OG tags, and remove the Lovable OG images from `index.html`
+- [x] M5.1 Build `/` from Figma page 04 (node `23:3`). Use static product shots exported from Figma.
+- [x] M5.2 Responsive behaviour: stack to one column below 900 px. The mobile layout isn't designed; follow the section order.
+- [x] M5.3 Meta/OG tags, and remove the Lovable OG images from `index.html`
 
 ### M6: Polish & release
+Status: see [m6-checklist.md](m6-checklist.md). Automated a11y, offline, copy review and the clinical checklist are done; device, Lighthouse and screen-reader passes remain.
+
 - [ ] Accessibility audit (axe, keyboard, screen reader labels), and test 200% text zoom
 - [ ] Lighthouse: PWA installable, Performance ≥ 90 on a mid-range phone profile
 - [ ] Offline test of every flow, a copy review against 06, and the clinical-review checklist exported for sign-off

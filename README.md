@@ -1,47 +1,71 @@
-# Glucose Keeper
+# Glucose Keeper ("Keeper")
 
-A small, single-page blood glucose log that runs entirely in the browser. Add readings, see them on a chart with a daily summary, and export them as CSV or PDF. Data stays in the browser's `localStorage`; there is no backend or account.
+A gentle, local-first diary for people with diabetes who feel scared to check their glucose. It starts with what feels easy: meals, sleep, feelings, movement and water, each in three taps or fewer. Glucose comes in only when you're ready, through the Readiness Ladder:
 
-## Features
+1. Notice
+2. Feel
+3. Learn
+4. **Seal:** the meter photo is blurred and kept in an envelope
+5. **Ranges:** below, in your range or above, with no digits
+6. **Numbers:** exact values
 
-- Add a reading with value, time and an optional note for the selected date
-- Switch between mmol/L and mg/dL; values are stored in mg/dL and converted for display
-- Readings classified as low (below 70 mg/dL), normal or high (above 180 mg/dL) with colour coding
-- Date selector, readings list with delete, stats card and trend chart (Recharts)
-- Export to CSV or PDF (jsPDF with jspdf-autotable)
+A safety net never hides a reading that's too low or too high.
 
-This is a personal tracking aid, not medical advice or a medical device. The low/high thresholds are fixed in code and are not configurable.
+Two layers are optional:
+- **Tiny habits with Smart timing:** one research-backed micro-habit after a meal, with a "Why this?" on every suggestion.
+- **Fasting mode:** gentle eating windows and a Ramadan preset, behind a medication safety check, with stop rules always on screen.
 
-## Tech stack
+**Live:** https://tanzir71.github.io/glucose-keeper-app/. The landing page is at `/`; the installable app is at `/app/`.
 
-Vite, React 18, TypeScript, Tailwind CSS, shadcn/ui (Radix), Recharts, jsPDF, date-fns. Originally scaffolded with Lovable.
+> Keeper is a personal wellbeing diary, not a medical device. It doesn't diagnose or treat anything, and it doesn't replace your care team's advice. Clinical values and safety copy are marked **[CLINICAL-REVIEW]** and still need clinician sign-off before launch (see [`docs/keeper-v2/clinical-review-checklist.md`](docs/keeper-v2/clinical-review-checklist.md)).
+
+## Principles
+- **Local-first.** No account, no backend, no analytics. Everything lives on the device in IndexedDB (Dexie). Fonts and OCR models are self-hosted, and photos never leave the phone.
+- **No red, no scores, no streaks.** Glucose bands use lavender, sage and apricot, always with words.
+- **Today never shows a glucose number or colour** unless you choose Ranges or Numbers.
+- **Safety beats gentleness.** Readings under 70 or over 250 mg/dL are never sealed. Every threshold lives in [`src/lib/clinical/thresholds.ts`](src/lib/clinical/thresholds.ts).
 
 ## Getting started
-
-Prerequisites: Node.js and npm.
+Prerequisites: Node.js 20+ and npm.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite.
+The dev server runs on port 8080:
+- app: http://localhost:8080/glucose-keeper-app/app/
+- landing page: http://localhost:8080/glucose-keeper-app/
 
 ## Scripts
-
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Production build |
-| `npm run build:dev` | Build in development mode |
-| `npm run lint` | Run ESLint |
+| `npm run dev` | Vite dev server (copies the self-hosted OCR assets first) |
+| `npm run build` | Production build: landing + app, with a service worker for the app |
 | `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest: rules engines, thresholds, migration, OCR parser, components, axe and copy voice |
+| `npm run icons` | Regenerate the PWA icons and favicon |
 
 ## Project structure
+```
+index.html, app/index.html   landing and app entries (multi-page Vite build, HashRouter in the app)
+src/copy/en.ts               every user-facing string (Bangla will follow)
+src/lib/clinical/            [CLINICAL-REVIEW] thresholds and classifyReading()
+src/lib/rules/               pure rules engines: smart timing, invitation, insights, fasting
+src/lib/                     Dexie db, settings, v1 migration, photos, OCR, Ramadan times, export
+src/components/keeper/       Keeper UI: TabBar, LogTile, Chip, FaceOption, Sheet, RangeBar, Ring…
+src/features/                onboarding, today, log, checkin, habits, week, glucose, fasting, learn, you
+src/landing/                 the marketing landing page
+docs/keeper-v2/              the handoff spec, OCR spike notes, M6 checklist, clinical review list
+```
 
-```
-src/pages/        Index and NotFound pages
-src/components/   form, chart, list, stats, unit switcher, date selector, export buttons (+ ui/)
-src/lib/          localStorage persistence and CSV/PDF export
-src/types/        reading types, unit conversion, glucose level thresholds
-```
+## Deploying
+Pushing to `main` runs `.github/workflows/deploy.yml`, which lints, tests, builds and publishes `dist/` to GitHub Pages. In the repo's Settings → Pages, set **Source = GitHub Actions**.
+
+## Upgrading from v1
+On first open, v1 readings in `localStorage` are copied into IndexedDB, and the Numbers view is switched on so the old history stays visible. The v1 keys are kept until v2.1.
+
+## Design and spec
+- Figma: [Glucose](https://www.figma.com/design/SKYG2erloPFJBj05RKYBcp/Glucose)
+- Spec: [`docs/keeper-v2/README.md`](docs/keeper-v2/README.md)

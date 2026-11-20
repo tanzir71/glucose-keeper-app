@@ -20,18 +20,18 @@ export function LogTile({
       type="button"
       onClick={onClick}
       aria-label={t.logAria(label)}
-      className="group flex w-[62px] flex-col items-center gap-1.5 rounded-tile focus-visible:outline-none"
+      className="group flex w-[3.875rem] flex-col items-center gap-1.5 rounded-tile focus-visible:outline-none"
     >
       <span
         className={cn(
-          "flex h-[58px] w-[58px] items-center justify-center rounded-tile transition-transform group-active:scale-95 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background",
+          "flex h-[3.625rem] w-[3.625rem] items-center justify-center rounded-tile transition-transform group-active:scale-95 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background",
           KIND_SOFT[kind],
           highlight && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
         )}
       >
         <Icon aria-hidden className="h-6 w-6 text-foreground" strokeWidth={1.8} />
       </span>
-      <span className="t-label text-foreground">{label}</span>
+      <span className="t-label text-center text-foreground">{label}</span>
     </button>
   );
 }
