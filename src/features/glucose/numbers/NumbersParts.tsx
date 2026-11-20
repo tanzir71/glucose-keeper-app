@@ -69,8 +69,10 @@ export function Stats({ readings, unit, range }: { readings: GlucoseReading[]; u
           <p className="t-caption text-muted-foreground">{t.numbers.stats.average}</p>
         </div>
         <div>
-          <p className="t-heading">{Math.round((bands.in / values.length) * 100)}%</p>
-          <p className="t-caption text-muted-foreground">{t.numbers.stats.inRange}</p>
+          <p className="t-heading">
+            {formatGlucose(Math.min(...values), unit)}–{formatGlucose(Math.max(...values), unit)}
+          </p>
+          <p className="t-caption text-muted-foreground">{t.numbers.stats.spread}</p>
         </div>
         <div>
           <p className="t-heading">{values.length}</p>

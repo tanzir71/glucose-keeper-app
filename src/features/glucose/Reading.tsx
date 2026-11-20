@@ -8,6 +8,7 @@ import { RangeBar } from "@/components/keeper/RangeBar";
 import { bandLabelKey, formatGlucose } from "@/lib/clinical/thresholds";
 import { useSettings } from "@/lib/settings";
 import { t } from "@/copy/en";
+import type { HabitId } from "@/types/domain";
 import { useReading } from "./useReading";
 
 /** D5 Opened · ranges (Figma 16:657). The number stays behind "Show the number". */
@@ -32,8 +33,16 @@ export default function Reading() {
 
   // Only tiny habits that are on, plus veggies-first.
   const helps: { key: string; icon: JSX.Element; text: string; tone: string }[] = [];
-  if (settings.tinyHabits && settings.habitsEnabled.includes("stroll"))
-    helps.push({ key: "stroll", icon: <Leaf aria-hidden className="h-5 w-5" />, text: t.reading.helpStroll(slot), tone: "bg-move-soft" });
+  const order: HabitId[] =
+    settings.rhythm?.workday === "desk" ? ["calf-raises", "stairs-stroll", "desk-moves", "stroll"] : ["stroll", "hallway-laps", "stand"];
+  const habit = settings.tinyHabits ? order.find((h) => settings.habitsEnabled.includes(h)) : undefined;
+  if (habit)
+    helps.push({
+      key: habit,
+      icon: <Leaf aria-hidden className="h-5 w-5" />,
+      text: habit === "stroll" ? t.reading.helpStroll(slot) : t.reading.helpHabit(t.habits[habit].title, slot),
+      tone: "bg-move-soft",
+    });
   helps.push({ key: "veggies", icon: <Utensils aria-hidden className="h-5 w-5" />, text: t.reading.helpVeggies, tone: "bg-meal-soft" });
 
   return (

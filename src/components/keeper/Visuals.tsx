@@ -15,14 +15,14 @@ export function Quilt({
   columns = 5,
   label,
 }: {
-  rows: { label: string; ariaLabel: string; patches: QuiltPatch[] }[];
+  rows: { label: string; ariaLabel: string; patches: QuiltPatch[]; future?: boolean }[];
   columns?: number;
   label: string;
 }) {
   return (
     <div role="list" aria-label={label} className="flex flex-col gap-2">
       {rows.map((row, i) => (
-        <div key={i} role="listitem" aria-label={row.ariaLabel} className="flex items-center gap-2">
+        <div key={i} role="listitem" aria-label={row.ariaLabel} className={cn("flex items-center gap-2", row.future && "opacity-35")}>
           <span aria-hidden className="t-caption w-4 shrink-0 text-muted-foreground">
             {row.label}
           </span>

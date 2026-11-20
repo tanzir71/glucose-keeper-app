@@ -19,7 +19,7 @@ export default function YouRhythm() {
   if (!rhythm) return <FlowScreen>{null}</FlowScreen>;
 
   const save = async () => {
-    await updateSettings({ rhythm: rhythmIsEmpty(rhythm) && !rhythm.indoorPreferred && !rhythm.workDays ? undefined : rhythm });
+    await updateSettings({ rhythm: rhythmIsEmpty(rhythm) ? undefined : rhythm });
     navigate("/you");
   };
 

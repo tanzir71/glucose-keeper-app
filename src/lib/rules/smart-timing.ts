@@ -234,6 +234,8 @@ export function pickNudge(input: NudgeInput): Nudge | null {
   if (unwellToday(now, past)) return null;
 
   // 2. Desk-break path (no qualifying meal): 90 min of sitting on a desk day.
+  // 04 §1 says "no move log in the last 90 min"; sitting is also reset by any meal (and starts at
+  // work start), because the spec's own test #4 expects no desk break 10 min after a light snack.
   const place = placeFor(now, settings, tz);
   if (place === "desk" && enabled.has("desk-moves")) {
     const wh = workHours(rhythm);

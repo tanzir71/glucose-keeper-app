@@ -12,7 +12,7 @@ import { useActiveFast, useAllReadings, useNow, useRecent } from "@/lib/data";
 import { bandLabelKey, classifyReading, formatGlucose } from "@/lib/clinical/thresholds";
 import { shouldInvite } from "@/lib/rules/invitation";
 import { weeklyInsights } from "@/lib/rules/insights";
-import { addDays, localDay } from "@/lib/rules/time";
+import { addDays, localDay, startOfLocalDay } from "@/lib/rules/time";
 import { fmtDayRange, fmtDayTime, weekdayInitial } from "@/lib/format";
 import { showsGlucose, updateSettings, useSettings } from "@/lib/settings";
 import { patchesFor } from "@/features/today/logView";
@@ -29,16 +29,24 @@ export default function Week() {
   const activeFast = useActiveFast();
   const navigate = useNavigate();
 
-  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(now, i - 6)), [now]);
+  // A calendar week, Monday to Sunday (D1: 7 rows M–S).
+  const days = useMemo(() => {
+    const monday = addDays(startOfLocalDay(now), -((now.getDay() + 6) % 7));
+    return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+  }, [now]);
+  const todayKey = localDay(now);
   if (!settings || !recent || !readings) return <TabScreen>{null}</TabScreen>;
 
   const rows = days.map((d) => {
     const key = localDay(d);
     const logs = recent.logs.filter((l) => localDay(l.at) === key);
+    const dayName = d.toLocaleDateString(undefined, { weekday: "long" });
+    const future = key > todayKey;
     return {
       label: weekdayInitial(d),
-      ariaLabel: t.week.dayRow(d.toLocaleDateString(undefined, { weekday: "long" }), logs.length),
+      ariaLabel: future ? t.week.notYet(dayName) : t.week.dayRow(dayName, logs.length),
       patches: patchesFor(logs).slice(0, 5),
+      future,
     };
   });
 

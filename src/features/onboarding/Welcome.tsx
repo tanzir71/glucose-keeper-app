@@ -38,8 +38,7 @@ export default function Welcome() {
           <br />
           {t.welcome.im}
         </h1>
-        <p className="t-body-l mt-5 text-muted-foreground">{t.welcome.body}</p>
-        {!!legacy && <p className="t-body-strong mt-4 text-primary-strong">{t.welcome.returning}</p>}
+        <p className="t-body-l mt-5 text-muted-foreground">{legacy ? t.welcome.returning : t.welcome.body}</p>
       </div>
       <div className="mt-10 flex items-center gap-3 rounded-card bg-card p-4">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary-soft">

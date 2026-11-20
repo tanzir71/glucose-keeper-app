@@ -1,12 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { TimelineItem } from "@/components/keeper/TimelineItem";
-import { BandDot } from "@/components/keeper/RangeBar";
-import { classifyReading, bandLabelKey, formatGlucose } from "@/lib/clinical/thresholds";
 import { fmtTime } from "@/lib/format";
 import { usePhotoUrl } from "@/lib/photos";
 import { t } from "@/copy/en";
 import { logTitle } from "./logView";
-import type { CheckIn, GlucoseReading, LogEntry, Settings } from "@/types/domain";
+import type { CheckIn, GlucoseReading, LogEntry } from "@/types/domain";
 
 function MealThumb({ photoId }: { photoId: string }) {
   const url = usePhotoUrl(photoId);
@@ -23,16 +21,13 @@ export function Timeline({
   checkins,
   readings,
   envelopeNo,
-  settings,
 }: {
   logs: LogEntry[];
   checkins: CheckIn[];
   readings: GlucoseReading[];
   envelopeNo: Map<string, number>;
-  settings: Settings;
 }) {
   const navigate = useNavigate();
-  const shows = settings.glucoseComfort === "ranges" || settings.glucoseComfort === "numbers";
   const checkinByMeal = new Map(checkins.map((c) => [c.mealId, c]));
 
   type Row = { at: string; key: string; node: JSX.Element };
@@ -60,22 +55,9 @@ export function Timeline({
   for (const r of readings) {
     const n = envelopeNo.get(r.id) ?? 0;
     const sealed = r.state === "sealed";
-    let meta: React.ReactNode = sealed ? t.timeline.sealedMeta : t.week.opened;
-    if (!sealed && shows && r.valueMgdl != null) {
-      const label = t.reading.labels[bandLabelKey(r.valueMgdl, settings.targetRange)];
-      meta =
-        settings.glucoseComfort === "numbers" ? (
-          <span className="inline-flex items-center gap-1.5">
-            <BandDot band={classifyReading(r.valueMgdl, settings.targetRange).band} />
-            {formatGlucose(r.valueMgdl, settings.unit)} {settings.unit} · {label}
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5">
-            <BandDot band={classifyReading(r.valueMgdl, settings.targetRange).band} />
-            {label}
-          </span>
-        );
-    }
+    // Today shows glucose only through the slim "last reading" chip (01 B1); the timeline
+    // just marks that a check happened.
+    const meta = sealed ? t.timeline.sealedMeta : t.week.opened;
     rows.push({
       at: r.at,
       key: r.id,

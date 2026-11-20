@@ -222,7 +222,11 @@ export default function Check() {
         description={t.check.symptomQ}
         footer={
           <div className="space-y-2">
-            <Button size="lg" variant="destructive" onClick={() => navigate("/glucose/safety/unwell", { replace: true })}>
+            <Button size="lg" variant="destructive" onClick={async () => {
+                // Keep the unread envelope (and its photo) so it isn't lost, then look after her.
+                await saveReading({ valueMgdl: null, source: "photo", settings, photoId: photo?.id, activeFast });
+                navigate("/glucose/safety/unwell", { replace: true });
+              }}>
               {t.common.yes}
             </Button>
             <Button size="lg" variant="outline" onClick={() => finish(null, "photo")}>

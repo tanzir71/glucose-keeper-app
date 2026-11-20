@@ -201,7 +201,7 @@ export default function Today() {
           <p className="t-body mt-3 rounded-[20px] border border-dashed border-border px-4 py-5 text-center text-muted-foreground">{t.today.empty}</p>
         ) : (
           <div className="mt-3">
-            <Timeline logs={data.todayLogs} checkins={recent.checkins} readings={data.todayReadings} envelopeNo={envelopeNo} settings={settings} />
+            <Timeline logs={data.todayLogs} checkins={recent.checkins} readings={data.todayReadings} envelopeNo={envelopeNo} />
           </div>
         )}
       </section>
