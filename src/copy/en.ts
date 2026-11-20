@@ -348,7 +348,6 @@ export const en = {
   // ---------- Week ----------
   week: {
     title: "Your week",
-    range: (from: string, to: string) => `${from} – ${to}`,
     quiltLabel: "This week's patches, one row per day",
     dayRow: (day: string, n: number) => `${day}: ${plural(n, "patch", "patches")}`,
     invitationOverline: "Something you might wonder",

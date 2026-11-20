@@ -12,7 +12,13 @@ export const fmtDayTime = (d: Date | string) => `${fmtShortDay(d)} ${fmtTime(d)}
 
 export const fmtDate = (d: Date | string) => new Date(d).toLocaleDateString(loc, { day: "numeric", month: "short", year: "numeric" });
 
-export const fmtDayMonth = (d: Date | string) => new Date(d).toLocaleDateString(loc, { day: "numeric", month: "long" });
+/** "14–20 November" (en-GB) / "November 14 – 20" (en-US): the device locale's own range format. */
+export function fmtDayRange(a: Date, b: Date): string {
+  const f = new Intl.DateTimeFormat(loc, { day: "numeric", month: "long" }) as Intl.DateTimeFormat & {
+    formatRange?: (a: Date, b: Date) => string;
+  };
+  return f.formatRange ? f.formatRange(a, b) : `${f.format(a)} – ${f.format(b)}`;
+}
 
 export const weekdayInitial = (d: Date) => d.toLocaleDateString(loc, { weekday: "narrow" });
 

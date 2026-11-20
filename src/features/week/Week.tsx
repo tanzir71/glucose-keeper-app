@@ -13,7 +13,7 @@ import { bandLabelKey, classifyReading, formatGlucose } from "@/lib/clinical/thr
 import { shouldInvite } from "@/lib/rules/invitation";
 import { weeklyInsights } from "@/lib/rules/insights";
 import { addDays, localDay } from "@/lib/rules/time";
-import { fmtDayMonth, fmtDayTime, weekdayInitial } from "@/lib/format";
+import { fmtDayRange, fmtDayTime, weekdayInitial } from "@/lib/format";
 import { showsGlucose, updateSettings, useSettings } from "@/lib/settings";
 import { patchesFor } from "@/features/today/logView";
 import { WeightCard } from "@/features/fasting/WeightCard";
@@ -63,7 +63,7 @@ export default function Week() {
 
   return (
     <TabScreen>
-      <p className="t-overline text-muted-foreground">{t.week.range(fmtDayMonth(days[0]), fmtDayMonth(days[6]))}</p>
+      <p className="t-overline text-muted-foreground">{fmtDayRange(days[0], days[6])}</p>
       <h1 className="t-title mt-2">{t.week.title}</h1>
 
       <section className="mt-4 rounded-card bg-card p-4">
