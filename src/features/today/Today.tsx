@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { ChevronDown, Mail, Utensils } from "lucide-react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -8,6 +8,7 @@ import { TabScreen } from "@/components/keeper/Layout";
 import { TILE_KINDS } from "@/components/keeper/kinds";
 import { BandDot } from "@/components/keeper/RangeBar";
 import { NudgeCard } from "@/features/habits/NudgeCard";
+import { settleFinishedFasts } from "@/lib/fastingStore";
 import { db } from "@/lib/db";
 import { dueCheckIn, useActiveFast, useNow, useRecent } from "@/lib/data";
 import { bandLabelKey, classifyReading, formatGlucose } from "@/lib/clinical/thresholds";
@@ -22,6 +23,12 @@ import type { LogKind, Settings } from "@/types/domain";
 import { Timeline, patchesFor } from "./Timeline";
 import { TodayTop } from "./TodayTop";
 
+// Fasting and Ramadan variants (and adhan) load only when Fasting mode is on.
+const FastingTop = lazy(() => import("@/features/fasting/FastingTop").then((m) => ({ default: m.FastingTop })));
+const EatingWindowCard = lazy(() => import("@/features/fasting/FastingTop").then((m) => ({ default: m.EatingWindowCard })));
+const StepUpCard = lazy(() => import("@/features/fasting/FastingTop").then((m) => ({ default: m.StepUpCard })));
+const RamadanTop = lazy(() => import("@/features/fasting/RamadanTop").then((m) => ({ default: m.RamadanTop })));
+
 /** B1 Today (Figma 14:66). Never shows a glucose number or colour unless comfort is ranges/numbers. */
 export default function Today() {
   const settings = useSettings();
@@ -31,6 +38,13 @@ export default function Today() {
   const envelopeIds = useLiveQuery(() => db.readings.orderBy("at").primaryKeys(), []);
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
+  const weights = useLiveQuery(() => db.weights.orderBy("at").toArray(), []);
+
+  // Close fasts whose planned end has passed (completed — ending is never automatic otherwise).
+  const minuteKey = Math.floor(now.getTime() / 60_000);
+  useEffect(() => {
+    void settleFinishedFasts(new Date(minuteKey * 60_000));
+  }, [minuteKey]);
 
   const today = localDay(now);
   const data = useMemo(() => {
@@ -49,7 +63,12 @@ export default function Today() {
   if (!settings || !recent || !data || activeFast === undefined) return <TabScreen>{null}</TabScreen>;
 
   const fast = activeFast ?? undefined;
-  const nudge = pickNudge({
+  const track = settings.fasting.track;
+  // Ramadan: no food nudges while fasting, and tiny habits resume ≥ 60 min after iftar.
+  const afterIftar = recent.fasts.some(
+    (f) => f.track === "ramadan" && new Date(f.plannedEndAt) <= now && minutesBetween(f.plannedEndAt, now) < 60,
+  );
+  const nudge = afterIftar ? null : pickNudge({
     now,
     settings,
     logs: data.logs24,
@@ -67,7 +86,27 @@ export default function Today() {
 
   return (
     <TabScreen>
-      <TodayTop settings={settings} now={now} activeFast={fast} patches={patchesFor(data.todayLogs)} count={data.todayLogs.length} />
+      <Suspense fallback={<div className="h-32" />}>
+        {track === "ramadan" ? (
+          <RamadanTop settings={settings} now={now} sessions={recent.fasts} />
+        ) : fast ? (
+          <FastingTop settings={settings} now={now} session={fast} readings={recent.readings} logs={data.logs24} />
+        ) : (
+          <>
+            <TodayTop settings={settings} now={now} activeFast={fast} patches={patchesFor(data.todayLogs)} count={data.todayLogs.length} />
+            {track && (
+              <div className="mt-4">
+                <EatingWindowCard settings={settings} now={now} />
+              </div>
+            )}
+          </>
+        )}
+        {track && track !== "ramadan" && track !== "doctor-plan" && (
+          <div className="mt-4">
+            <StepUpCard settings={settings} sessions={recent.fasts} readings={recent.readings} logs={recent.logs} weights={weights ?? []} now={now} />
+          </div>
+        )}
+      </Suspense>
 
       <section className="mt-6" aria-labelledby="add-to-today">
         <Overline as="h2">
@@ -137,7 +176,9 @@ export default function Today() {
         )}
       </section>
 
-      <Outlet />
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </TabScreen>
   );
 }

@@ -29,6 +29,12 @@ const Reading = lazy(() => import("@/features/glucose/Reading"));
 const Safety = lazy(() => import("@/features/glucose/Safety"));
 const SafetyTimer = lazy(() => import("@/features/glucose/SafetyTimer"));
 const Numbers = lazy(() => import("@/features/glucose/numbers/Numbers"));
+const FastingMode = lazy(() => import("@/features/fasting/FastingMode"));
+const FastingSafety = lazy(() => import("@/features/fasting/FastingSafety"));
+const RamadanSetup = lazy(() => import("@/features/fasting/RamadanSetup"));
+const DoctorPlan = lazy(() => import("@/features/fasting/DoctorPlan"));
+const StopSheet = lazy(() => import("@/features/fasting/StopSheet"));
+const YouWeight = lazy(() => import("@/features/you/YouWeight"));
 
 function Splash() {
   return <div className="min-h-dvh bg-background" aria-busy="true" />;
@@ -68,6 +74,7 @@ export default function App() {
 
             <Route path="/" element={<Today />}>
               <Route path="log/:kind" element={<LogSheet />} />
+              <Route path="fasting/stop" element={<StopSheet />} />
             </Route>
             <Route path="/checkin/:mealId" element={<CheckIn />} />
             <Route path="/habit/:habitId" element={<HabitTimer />} />
@@ -81,6 +88,11 @@ export default function App() {
             <Route path="/you/rhythm" element={<YouRhythm />} />
             <Route path="/you/range" element={<YouRange />} />
             <Route path="/you/export" element={<ExportPage />} />
+            <Route path="/you/weight" element={<YouWeight />} />
+            <Route path="/you/fasting" element={<FastingMode />} />
+            <Route path="/you/fasting/safety" element={<FastingSafety />} />
+            <Route path="/you/fasting/ramadan" element={<RamadanSetup />} />
+            <Route path="/you/fasting/doctor" element={<DoctorPlan />} />
 
             <Route path="/glucose/comfort" element={<Comfort />} />
             <Route path="/glucose/check" element={<Check />} />

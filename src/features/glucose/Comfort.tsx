@@ -98,6 +98,7 @@ export default function Comfort() {
               type="button"
               role="radio"
               aria-checked={selected}
+              aria-label={`${copy.title}. ${copy.body}`}
               onClick={() => setChoice(c)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-card bg-card p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",

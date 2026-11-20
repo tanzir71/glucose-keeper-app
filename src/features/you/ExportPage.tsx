@@ -82,7 +82,7 @@ export default function ExportPage() {
         <section className="mt-3 rounded-card bg-card p-4">
           <p className="t-body">{t.export.includeSealedQ}</p>
           <label className="mt-3 flex min-h-11 items-center gap-3">
-            <Checkbox checked={includeSealed} onCheckedChange={(v) => setIncludeSealed(v === true)} className="h-6 w-6 rounded-md" />
+            <Checkbox checked={includeSealed} onCheckedChange={(v) => setIncludeSealed(v === true)} aria-label={t.export.includeSealed} className="h-6 w-6 rounded-md" />
             <span className="t-body-strong">{t.export.includeSealed}</span>
           </label>
         </section>
