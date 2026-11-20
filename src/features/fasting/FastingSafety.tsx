@@ -42,9 +42,10 @@ export default function FastingSafety() {
   const risky1 = !!q1 && q1 !== "no";
   const risky2 = !!q2 && q2 !== "no";
   const gate = canStart(track, answers);
-  // Ramadan with a "-gliflozin" yes/not sure also waits for the care-team checkbox.
-  const ramadanNeedsConfirm = track === "ramadan" && (risky1 || risky2) && !confirmed;
-  const ok = !!q1 && !!q2 && gate.ok && !ramadanNeedsConfirm;
+  // Ramadan is a fast she may keep anyway, so Keeper supports it rather than blocking it: with
+  // insulin/sulfonylureas "yes"/"not sure" it shows the plum highRisk card, and the plan card
+  // stays until the care-team box is ticked (05 §4.3, §4.5).
+  const ok = !!q1 && !!q2 && gate.ok;
 
   const go = async (chosen: FastTrack) => {
     await updateSettings({ fasting: { ...answers, track: chosen, windowStart: chosen === track ? start : undefined } });

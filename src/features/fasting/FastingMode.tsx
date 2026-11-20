@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Overline, Segmented } from "@/components/keeper/Controls";
-import { BackHeader, FlowScreen } from "@/components/keeper/Layout";
-import { DEFAULT_WINDOW_START, eatingWindow, needsSafetyCheck, windowFitsRhythm } from "@/lib/rules/fasting";
+import { BackHeader, FlowScreen, WhyThis } from "@/components/keeper/Layout";
+import { DEFAULT_WINDOW_START, earlierWindow, eatingWindow, needsSafetyCheck, windowFitsRhythm } from "@/lib/rules/fasting";
 import { updateSettings, useSettings } from "@/lib/settings";
 import { fmtHM } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -72,6 +72,8 @@ export default function FastingMode() {
   const coached = choice === "overnight-12" || choice === "window";
   const win = coached ? eatingWindow(track, start ?? DEFAULT_WINDOW_START[track as keyof typeof DEFAULT_WINDOW_START]) : null;
   const fits = !win || windowFitsRhythm(win.open, win.close, settings.rhythm);
+  const earlier = win && fits ? earlierWindow(track, win.open, settings.rhythm) : null;
+  const earlierW = earlier ? eatingWindow(track, earlier) : null;
 
   const cont = async () => {
     if (choice === "doctor-plan") return navigate("/you/fasting/doctor");
@@ -180,6 +182,17 @@ export default function FastingMode() {
           <p className="t-caption mt-2 text-muted-foreground">
             {fits ? `${t.fasting.windowLine(fmtHM(win.open), fmtHM(win.close))} · ${t.fasting.windowStartHint}` : t.fasting.windowInvalid}
           </p>
+          {earlierW && (
+            <div className="mt-3 rounded-2xl bg-move-soft p-3">
+              <p className="t-body-strong">
+                {t.fasting.earlierTitle}: {t.fasting.earlierLine(fmtHM(earlierW.open), fmtHM(earlierW.close))}
+              </p>
+              <Button size="sm" variant="outline" className="mt-2" onClick={() => setStart(earlierW.open)}>
+                {t.fasting.earlierUse}
+              </Button>
+              <WhyThis reason={t.fasting.earlierReason} className="mt-2" />
+            </div>
+          )}
         </section>
       )}
 

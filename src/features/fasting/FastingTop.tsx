@@ -8,7 +8,7 @@ import { Ring } from "@/components/keeper/Visuals";
 import { DateAvatar } from "@/features/today/TodayTop";
 import { WhyThis } from "@/components/keeper/Layout";
 import { addFastDrink, addFastFeeling, endFast, startFast } from "@/lib/fastingStore";
-import { canStart, eatingWindow, fastProgress, nextFastStart, offerNextStep, weightSoftening } from "@/lib/rules/fasting";
+import { canStart, eatingWindow, fastProgress, nextFastStart, offerNextStep, weightSoftening, windowStartFor } from "@/lib/rules/fasting";
 import { useStopRules } from "./useStopRules";
 import { minutesBetween } from "@/lib/rules/time";
 import { updateSettings } from "@/lib/settings";
@@ -40,7 +40,12 @@ export function StopRulesLink({ ramadan }: { ramadan?: boolean }) {
 
 /** Step-up offer (05 §4.4). Dismissible; never switches automatically. */
 export function StepUpCard({ settings, sessions, readings, logs, weights, now }: { settings: Settings; sessions: FastSession[]; readings: GlucoseReading[]; logs: LogEntry[]; weights: WeightEntry[]; now: Date }) {
-  const softening = weightSoftening(weights);
+  // Softening (05 §4.7): rapid weight loss, or 3+ "Skipped a meal" feelings in the last 7 days.
+  const weekAgo = now.getTime() - 7 * 86_400_000;
+  const skipped = logs.filter(
+    (l) => l.data.kind === "feeling" && new Date(l.at).getTime() >= weekAgo && !!l.data.tags?.includes("skipped-meal"),
+  ).length;
+  const softening = weightSoftening(weights, skipped);
   const offer = offerNextStep({ now, fasting: settings.fasting, sessions, readings, logs, softening });
   if (softening && settings.fasting.track && settings.fasting.track !== "ramadan") {
     return <p className="t-body rounded-card bg-feeling-soft p-4">{t.fasting.softening}</p>;
@@ -53,7 +58,7 @@ export function StepUpCard({ settings, sessions, readings, logs, weights, now }:
       <p className="t-body-strong">{t.fasting.stepUp(offer.hours)}</p>
       <WhyThis reason={offer.reason} className="mt-2" />
       <div className="mt-3 flex gap-2">
-        <Button size="sm" onClick={() => canStart(offer.next, settings.fasting).ok && record({ track: offer.next, windowStart: undefined })}>
+        <Button size="sm" onClick={() => canStart(offer.next, settings.fasting).ok && record({ track: offer.next, windowStart: windowStartFor(offer.next, settings.fasting.windowStart, settings.rhythm) })}>
           {t.fasting.tryIt}
         </Button>
         <Button size="sm" variant="outline" onClick={() => record({})}>
@@ -79,6 +84,8 @@ export function EatingWindowCard({ settings, now }: { settings: Settings; now: D
       <p className="t-body-strong mt-1">{t.fasting.notFasting}</p>
       {w && <p className="t-caption text-muted-foreground">{t.fasting.windowLine(fmtHM(w.open), fmtHM(w.close))}</p>}
       {track !== "doctor-plan" && <p className="t-caption text-muted-foreground">{t.fasting.nextFast(fmtTime(nextStart))}</p>}
+      {/* Hydration rule (05 §4.3): water is always encouraged in the window. */}
+      {canStart(track, settings.fasting).flags?.hydrationRule && <p className="t-body mt-2">{t.fasting.hydration}</p>}
       <Button size="sm" variant="outline" className="mt-3" onClick={start}>
         {t.fasting.startNow}
       </Button>

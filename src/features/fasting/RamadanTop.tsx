@@ -8,7 +8,7 @@ import { WhyThis } from "@/components/keeper/Layout";
 import { startFast } from "@/lib/fastingStore";
 import { CITIES, DEFAULT_RAMADAN, PRE_RAMADAN_WEEKS, ramadanPhase, type RamadanPhase } from "@/lib/ramadan";
 import { canStart } from "@/lib/rules/fasting";
-import { localDay, minutesBetween } from "@/lib/rules/time";
+import { addDays, localDay, minutesBetween } from "@/lib/rules/time";
 import { updateSettings } from "@/lib/settings";
 import { fmtDate, fmtTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -68,7 +68,9 @@ export function RamadanTop({
   const phase: RamadanPhase | null = ramadanPhase(now, r, city);
   const flags = canStart("ramadan", settings.fasting).flags ?? { hydrationRule: false };
   const todayKey = localDay(now);
-  const water = r.water?.[todayKey] ?? 0;
+  // After midnight (before suhoor ends) the night still belongs to yesterday's iftar.
+  const waterKey = phase && phase.phase === "window" && now < phase.times.suhoorEnds ? localDay(addDays(now, -1)) : todayKey;
+  const water = r.water?.[waterKey] ?? 0;
 
   // Record today's fast (fajr → maghrib) so stop rules, export and the after-Eid summary work.
   // (Finished days are closed by settleFinishedFasts on Today.)
@@ -85,7 +87,7 @@ export function RamadanTop({
   useStopRules(todays && !todays.endedAt ? todays : undefined, readings, logs);
 
   const setWater = (n: number) =>
-    updateSettings((s) => ({ fasting: { ...s.fasting, ramadan: { ...DEFAULT_RAMADAN, ...s.fasting.ramadan, water: { ...(s.fasting.ramadan?.water ?? {}), [todayKey]: n } } } }));
+    updateSettings((s) => ({ fasting: { ...s.fasting, ramadan: { ...DEFAULT_RAMADAN, ...s.fasting.ramadan, water: { ...(s.fasting.ramadan?.water ?? {}), [waterKey]: n } } } }));
 
   if (!phase) {
     return (

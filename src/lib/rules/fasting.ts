@@ -99,6 +99,39 @@ export function windowFitsRhythm(open: string, close: string, rhythm?: Rhythm): 
   return true;
 }
 
+/**
+ * "Same window, a little earlier" (Panda / Peterson): an earlier eating-window start that still
+ * leaves breakfast-time or an hour after waking, and never runs into sleep. null if none fits.
+ */
+export function earlierWindow(track: FastTrack, start: string, rhythm?: Rhythm): string | null {
+  const w = eatingWindow(track, start);
+  if (!w) return null;
+  const wake = parseHM(rhythm?.wake ?? DEFAULT_RHYTHM.wake);
+  const earliest = rhythm?.meals?.breakfast ? parseHM(rhythm.meals.breakfast) : wake + 60;
+  for (const back of [60, 30]) {
+    const s = parseHM(w.open) - back;
+    if (s < earliest) continue;
+    const cand = eatingWindow(track, formatHM(s))!;
+    if (windowFitsRhythm(cand.open, cand.close, rhythm)) return cand.open;
+  }
+  return null;
+}
+
+/** A window start for `track` that fits her rhythm: her current start, the default, or the first fit. */
+export function windowStartFor(track: FastTrack, preferred: string | undefined, rhythm?: Rhythm): string | undefined {
+  const fits = (s: string) => {
+    const w = eatingWindow(track, s);
+    return !!w && windowFitsRhythm(w.open, w.close, rhythm);
+  };
+  const def = DEFAULT_WINDOW_START[track as keyof typeof DEFAULT_WINDOW_START];
+  if (!def) return undefined;
+  if (preferred && fits(preferred)) return preferred;
+  if (fits(def)) return def;
+  const wake = parseHM(rhythm?.wake ?? DEFAULT_RHYTHM.wake);
+  for (let s = wake + 60; s <= wake + 8 * 60; s += 30) if (fits(formatHM(s))) return formatHM(s);
+  return def;
+}
+
 /** The planned end of a fast that starts at `startedAt`. Doctor's-plan hours are logged as-is. */
 export function plannedEnd(track: FastTrack, startedAt: Date, fasting?: Fasting): Date {
   const h = trackHours(track, fasting) ?? 12;

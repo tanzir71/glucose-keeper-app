@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canStart,
+  earlierWindow,
   eatingWindow,
   inEatingWindow,
   nextTrack,
@@ -9,6 +10,7 @@ import {
   shouldStopFast,
   weightSoftening,
   windowFitsRhythm,
+  windowStartFor,
   type StepUpInput,
 } from "./fasting";
 import type { FastSession, GlucoseReading, LogEntry, Settings } from "@/types/domain";
@@ -97,6 +99,23 @@ describe("windows and limits", () => {
     expect(windowFitsRhythm("09:00", "21:00", { wake: "07:00", sleep: "23:00" })).toBe(true);
     expect(windowFitsRhythm("12:00", "00:00", { wake: "07:00", sleep: "23:00" })).toBe(false);
     expect(windowFitsRhythm("06:00", "18:00", { wake: "07:00", sleep: "23:00" })).toBe(false);
+  });
+
+  it("suggests the same window a little earlier, never before breakfast or into sleep", () => {
+    const r = { wake: "07:00", sleep: "23:00", meals: { breakfast: "08:00" } };
+    expect(earlierWindow("window-14", "11:00", r)).toBe("10:00");
+    expect(earlierWindow("window-14", "08:30", r)).toBe("08:00"); // 07:30 would be before breakfast
+    expect(earlierWindow("window-14", "08:00", r)).toBeNull();
+    expect(earlierWindow("overnight-12", "09:00", r)).toBe("08:00");
+    expect(earlierWindow("ramadan", "09:00", r)).toBeNull();
+  });
+
+  it("step-ups keep the window out of sleep time", () => {
+    expect(windowStartFor("window-16", "11:00", { wake: "07:00", sleep: "23:00" })).toBe("11:00");
+    // Night owl: default 11:00–19:00 is fine; a 16:00 start would run past sleep at 23:00.
+    expect(windowStartFor("window-16", "16:00", { wake: "07:00", sleep: "23:00" })).toBe("11:00");
+    // Late sleeper (sleep 02:00 → wake 10:00): the 09:00 default is still asleep, so start at 11:00.
+    expect(windowStartFor("window-13", undefined, { wake: "10:00", sleep: "02:00" })).toBe("11:00");
   });
 
   it("planned end follows the track", () => {

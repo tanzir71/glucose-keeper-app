@@ -224,7 +224,7 @@ export const en = {
   feeling: {
     title: "How are you feeling?",
     tagsTitle: "Anything else?",
-    tags: { tired: "Tired", stressed: "Stressed", calm: "Calm", headache: "Headache", unwell: "Unwell", thirsty: "Thirsty" } as Record<string, string>,
+    tags: { tired: "Tired", stressed: "Stressed", calm: "Calm", headache: "Headache", unwell: "Unwell", thirsty: "Thirsty", "skipped-meal": "Skipped a meal" } as Record<string, string>,
   },
 
   move: {
@@ -699,6 +699,10 @@ export const en = {
     windowStart: "Your eating window opens at",
     windowStartHint: "Earlier windows suit many people. Never inside your sleep time.",
     windowInvalid: "That window would run into your sleep. Try an earlier start.",
+    earlierTitle: "Same window, a little earlier",
+    earlierLine: (open: string, close: string) => `${open} – ${close}`,
+    earlierUse: "Use it",
+    earlierReason: "earlier eating windows did well in studies, and this one still fits your mornings and your sleep",
     // Exclusion check (05 §4.2)
     exclusionTitle: "Do any of these apply to you?",
     exclusionSub: "Keeper only stores yes or no — never which one.",
